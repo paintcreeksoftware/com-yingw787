@@ -1,0 +1,5 @@
+{
+  "editor.unicodeHighlight.ambiguousCharacters": true,
+  "editor.unicodeHighlight.includeStrings": true,
+  "editor.unicodeHighlight.includeComments": true
+}
