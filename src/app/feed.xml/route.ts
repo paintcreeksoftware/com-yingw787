@@ -1,6 +1,7 @@
 import assert from 'assert'
 import * as cheerio from 'cheerio'
 import { Feed } from 'feed'
+import glob from 'fast-glob'
 
 export async function GET(req: Request) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
@@ -28,11 +29,9 @@ export async function GET(req: Request) {
     },
   })
 
-  const articleIds = require
-    .context('../articles', true, /\/page\.mdx$/)
-    .keys()
-    .filter((key) => key.startsWith('./'))
-    .map((key) => key.slice(2).replace(/\/page\.mdx$/, ''))
+  const articleIds = (
+    await glob('*/page.mdx', { cwd: './src/app/articles' })
+  ).map((key) => key.replace(/\/page\.mdx$/, ''))
 
   for (const id of articleIds) {
     const url = String(new URL(`/articles/${id}`, req.url))
