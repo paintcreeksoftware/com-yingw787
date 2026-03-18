@@ -150,13 +150,13 @@ interface Role {
 }
 
 function Role({ role }: { role: Role }) {
-  let startLabel =
+  const startLabel =
     typeof role.start === 'string' ? role.start : role.start.label
-  let startDate =
+  const startDate =
     typeof role.start === 'string' ? role.start : role.start.dateTime
 
-  let endLabel = typeof role.end === 'string' ? role.end : role.end.label
-  let endDate = typeof role.end === 'string' ? role.end : role.end.dateTime
+  const endLabel = typeof role.end === 'string' ? role.end : role.end.label
+  const endDate = typeof role.end === 'string' ? role.end : role.end.dateTime
 
   return (
     <li className="flex gap-4">
@@ -187,10 +187,11 @@ function Role({ role }: { role: Role }) {
 }
 
 function Resume() {
-  let resume: Array<Role> = [
+  const resume: Role[] = [
     {
       company: 'Planetaria',
       title: 'CEO',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       logo: logoPlanetaria,
       start: '2019',
       end: {
@@ -201,6 +202,7 @@ function Resume() {
     {
       company: 'Airbnb',
       title: 'Product Designer',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       logo: logoAirbnb,
       start: '2014',
       end: '2019',
@@ -208,6 +210,7 @@ function Resume() {
     {
       company: 'Facebook',
       title: 'iOS Software Engineer',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       logo: logoFacebook,
       start: '2011',
       end: '2014',
@@ -215,6 +218,7 @@ function Resume() {
     {
       company: 'Starbucks',
       title: 'Shift Supervisor',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       logo: logoStarbucks,
       start: '2008',
       end: '2011',
@@ -228,8 +232,8 @@ function Resume() {
         <span className="ml-3">Work</span>
       </h2>
       <ol className="mt-6 space-y-4">
-        {resume.map((role, roleIndex) => (
-          <Role key={roleIndex} role={role} />
+        {resume.map((role) => (
+          <Role key={role.company} role={role} />
         ))}
       </ol>
       <Button href="#" variant="secondary" className="group mt-6 w-full">
@@ -241,7 +245,7 @@ function Resume() {
 }
 
 function Photos() {
-  let rotations = ['rotate-2', '-rotate-2', 'rotate-2', 'rotate-2', '-rotate-2']
+  const rotations = ['rotate-2', '-rotate-2', 'rotate-2', 'rotate-2', '-rotate-2']
 
   return (
     <div className="mt-16 sm:mt-20">
@@ -270,7 +274,7 @@ function Photos() {
 }
 
 export default async function Home() {
-  let articles = (await getAllArticles()).slice(0, 4)
+  const articles = (await getAllArticles()).slice(0, 4)
 
   return (
     <>
@@ -280,8 +284,8 @@ export default async function Home() {
             Software designer, founder, and amateur astronaut.
           </h1>
           <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
-            I’m Spencer, a software designer and entrepreneur based in New York
-            City. I’m the founder and CEO of Planetaria, where we develop
+            I&apos;m Spencer, a software designer and entrepreneur based in New York
+            City. I&apos;m the founder and CEO of Planetaria, where we develop
             technologies that empower regular people to explore space on their
             own terms.
           </p>

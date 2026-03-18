@@ -1,4 +1,4 @@
-import { type Metadata } from 'next'
+import type { Metadata } from 'next'
 
 import { Providers } from '@/app/providers'
 import { Layout } from '@/components/Layout'
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     'I’m Spencer, a software designer and entrepreneur based in New York City. I’m the founder and CEO of Planetaria, where we develop technologies that empower regular people to explore space on their own terms.',
   alternates: {
     types: {
-      'application/rss+xml': `${process.env.NEXT_PUBLIC_SITE_URL}/feed.xml`,
+      'application/rss+xml': `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/feed.xml`,
     },
   },
 }

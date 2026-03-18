@@ -1,5 +1,5 @@
-import { type Metadata } from 'next'
-import Image from 'next/image'
+import type { Metadata } from 'next'
+import Image, { type StaticImageData } from 'next/image'
 
 import { Card } from '@/components/Card'
 import { SimpleLayout } from '@/components/SimpleLayout'
@@ -9,12 +9,20 @@ import logoHelioStream from '@/images/logos/helio-stream.svg'
 import logoOpenShuttle from '@/images/logos/open-shuttle.svg'
 import logoPlanetaria from '@/images/logos/planetaria.svg'
 
-const projects = [
+interface Project {
+  name: string
+  description: string
+  link: { href: string; label: string }
+  logo: StaticImageData
+}
+
+const projects: Project[] = [
   {
     name: 'Planetaria',
     description:
       'Creating technology to empower civilians to explore space on their own terms.',
     link: { href: 'http://planetaria.tech', label: 'planetaria.tech' },
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     logo: logoPlanetaria,
   },
   {
@@ -22,6 +30,7 @@ const projects = [
     description:
       'High performance web animation library, hand-written in optimized WASM.',
     link: { href: '#', label: 'github.com' },
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     logo: logoAnimaginary,
   },
   {
@@ -29,6 +38,7 @@ const projects = [
     description:
       'Real-time video streaming library, optimized for interstellar transmission.',
     link: { href: '#', label: 'github.com' },
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     logo: logoHelioStream,
   },
   {
@@ -36,6 +46,7 @@ const projects = [
     description:
       'The operating system that powers our Planetaria space shuttles.',
     link: { href: '#', label: 'github.com' },
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     logo: logoCosmos,
   },
   {
@@ -43,6 +54,7 @@ const projects = [
     description:
       'The schematics for the first rocket I designed that successfully made it to orbit.',
     link: { href: '#', label: 'github.com' },
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     logo: logoOpenShuttle,
   },
 ]

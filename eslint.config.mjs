@@ -170,6 +170,7 @@ export default tseslint.config([
       "@typescript-eslint/prefer-optional-chain": "error",
       "@typescript-eslint/no-import-type-side-effects": "error",
       "@typescript-eslint/only-throw-error": "error",
+      "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }],
       "@typescript-eslint/no-require-imports": "error",
       "@typescript-eslint/no-useless-empty-export": "error",
       "@typescript-eslint/prefer-as-const": "error",

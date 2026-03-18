@@ -1,4 +1,5 @@
-import { type Config } from 'tailwindcss'
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+import type { Config } from 'tailwindcss'
 
 export default {
   theme: {
