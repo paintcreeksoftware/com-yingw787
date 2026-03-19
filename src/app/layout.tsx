@@ -7,12 +7,11 @@ import '@/styles/tailwind.css'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s - Spencer Sharp',
-    default:
-      'Spencer Sharp - Software designer, founder, and amateur astronaut',
+    template: '%s - Ying Wang',
+    default: 'Ying Wang - Software engineer, founder, and amateur woodworker',
   },
   description:
-    "I'm Spencer, a software designer and entrepreneur based in New York City. I'm the founder and CEO of Planetaria, where we develop technologies that empower regular people to explore space on their own terms.",
+    "I'm Ying Wang, a software engineer and founder based near Washington, D.C. I like creating quality software products that people are happy to use, and that coincidentally make companies lots of money.",
   alternates: {
     types: {
       'application/rss+xml': `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/feed.xml`,
