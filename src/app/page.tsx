@@ -36,7 +36,7 @@ export default function Home() {
             of money.
           </div>
           <div className="mt-6 flex gap-6">
-            {/* eslint-disable @typescript-eslint/no-unsafe-assignment */}
+            {/* eslint-disable @typescript-eslint/no-unsafe-assignment -- react-icons doesn't export typed components, icons are typed as `any` internally */}
             <SocialLink
               href="https://github.com/yingw787"
               aria-label="Follow on GitHub"
