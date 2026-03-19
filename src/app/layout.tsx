@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     default: 'Ying Wang - Software engineer, founder, and amateur woodworker',
   },
   description:
-    "I'm Ying Wang, a software engineer and founder based near Washington, D.C. I like creating quality software products that people are happy to use, and that coincidentally make companies lots of money.",
+    "I'm Ying, a software engineer and founder based near Washington, D.C. I like creating quality software products that people are happy to use, and that coincidentally make companies lots of money.",
   alternates: {
     types: {
       'application/rss+xml': `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/feed.xml`,
