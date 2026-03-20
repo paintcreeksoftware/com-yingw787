@@ -21,7 +21,7 @@ interface TestimonialQuote {
   quote: React.ReactNode
   avatarImage: StaticImageData
   name?: React.ReactNode
-  role: React.ReactNode
+  role?: React.ReactNode
 }
 
 const testimonials: TestimonialQuote[] = [
@@ -109,6 +109,29 @@ const testimonials: TestimonialQuote[] = [
     ),
     avatarImage: DefaultAvatar,
     role: <>VP of Acquisition Marketing, Series F security startup</>,
+  },
+  {
+    id: 'lihan-zhang',
+    quote: (
+      <>
+        As a former direct report to Ying, I am extremely grateful for the
+        opportunity to have worked with him. Ying is laser-focused on delivering
+        high-quality results for the business while also understanding the
+        importance of seeing people as people. He genuinely cares about the
+        well-being of his team and is a strong champion of both their
+        professional and personal growth. I can say wholeheartedly that I would
+        not be the engineer I am today without his guidance.
+      </>
+    ),
+    avatarImage: DefaultAvatar,
+    name: (
+      <a
+        href="https://www.linkedin.com/in/lihan-zhang-3b24a594"
+        className="text-blue-600"
+      >
+        Lihan Zhang
+      </a>
+    ),
   },
 ]
 

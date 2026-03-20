@@ -5,7 +5,7 @@ interface TestimonialSectionProps {
   quote: React.ReactNode
   avatarImage: StaticImageData
   name?: React.ReactNode
-  role: React.ReactNode
+  role?: React.ReactNode
 }
 
 /**
@@ -51,9 +51,11 @@ export const TestimonialSection = ({
                 {name}
               </div>
             )}
-            <div className="mt-0.5 text-zinc-800 dark:text-zinc-100">
-              {role}
-            </div>
+            {role && (
+              <div className="mt-0.5 text-zinc-800 dark:text-zinc-100">
+                {role}
+              </div>
+            )}
           </div>
         </figcaption>
       </figure>
