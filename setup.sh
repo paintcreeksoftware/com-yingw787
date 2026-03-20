@@ -29,3 +29,6 @@ popd || exit 1
 
 # Install system dependencies as exact.
 npm ci
+
+# Install Claude Code.
+npm install -g @anthropic-ai/claude-code
