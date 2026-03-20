@@ -4,6 +4,7 @@ import {
   FaGithub,
   FaPersonHiking,
   FaPersonWalkingLuggage,
+  FaEnvelope,
 } from 'react-icons/fa6'
 
 import { Container } from '@/components/Container'
@@ -206,6 +207,11 @@ export default function Home() {
                 href="https://bytes.yingw787.com"
                 aria-label="Professional Blog"
                 icon={FaPersonWalkingLuggage}
+              />
+              <SocialLink
+                href="mailto:ying@paintcreeksoftware.com"
+                aria-label="Email"
+                icon={FaEnvelope}
               />
             </div>
           </div>
