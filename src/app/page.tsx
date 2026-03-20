@@ -132,6 +132,32 @@ const testimonials: TestimonialQuote[] = [
         Lihan Zhang
       </a>
     ),
+    role: <>Software Engineer</>,
+  },
+  {
+    id: 'addison-jones',
+    quote: (
+      <>
+        Ying was the senior engineer and leader of the Data Engineering team at
+        Caribou when I joined and both the company and I benefitted greatly from
+        his technical knowledge, leadership skills, and friendly personality.
+        Ying was instrumental in my growth as an engineer and challenged me to
+        improve while also being fully supportive. His knowledge of software and
+        data engineering is both broad and deep. Each project Ying led came in
+        on time and with resounding success. I give my highest possible
+        recommendation for Ying as both an engineer, leader, and friend.
+      </>
+    ),
+    avatarImage: DefaultAvatar,
+    name: (
+      <a
+        href="https://www.linkedin.com/in/addisonjones3"
+        className="text-blue-600"
+      >
+        Addison Jones
+      </a>
+    ),
+    role: <>Software Engineer</>,
   },
 ]
 
