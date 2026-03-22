@@ -9,7 +9,14 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "check": "tsc --noEmit && eslint . && prettier . --check",
-    "fix": "eslint . --fix && prettier . --write"
+    "fix": "eslint . --fix && prettier . --write",
+    "check-bundle-size": "bundlewatch"
+  },
+  "bundlewatch": {
+    "files": [
+      { "path": ".next/static/chunks/*.js", "maxSize": "265kB" },
+      { "path": ".next/static/chunks/*.css", "maxSize": "31kB" }
+    ]
   },
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {
@@ -39,6 +46,7 @@
     "@types/node": "^24.1.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "bundlewatch": "^0.4.1",
     "eslint": "^9.39.4",
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.1.8",
