@@ -127,7 +127,9 @@
     // `act` is able to run GitHub Actions locally.
     "ghcr.io/itsmechlark/features/act:1": {},
     // `firebase-tools` required for deploying to Firebase.
-    "ghcr.io/devcontainers-extra/features/firebase-cli:2": {}
+    "ghcr.io/devcontainers-extra/features/firebase-cli:2": {},
+    // `gcloud` required for deploying to Google Cloud.
+    "ghcr.io/jajera/features/gcloud-cli:1": {}
   },
   "portsAttributes": {
     // Available when running task "Start" from VS Code Tasks.
