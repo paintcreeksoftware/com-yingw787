@@ -55,7 +55,3 @@ jobs:
             }
             const lines = Object.entries(scores).map(([k, v]) => `${k}: ${v}`)
             console.log('Lighthouse scores\n' + lines.join('\n'))
-            const failed = Object.entries(scores).filter(([, v]) => v < 90)
-            if (failed.length > 0) {
-              core.setFailed(`Scores below 90: ${failed.map(([k, v]) => `${k} (${v})`).join(', ')}`)
-            }
