@@ -32,8 +32,6 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: ${{ vars.FIREBASE_PROJECT_ID }}
           channelId: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'live' }}
-      - name: Debug URL
-        run: echo "Deploy URL is ${{ steps.firebase.outputs.details_url }}"
 
   lighthouse:
     name: Lighthouse
@@ -41,12 +39,11 @@ jobs:
     needs: deploy
     steps:
       - uses: actions/checkout@v4
-      - name: Debug URL
-        run: echo "URL from deploy job is ${{ needs.deploy.outputs.url }}"
       - name: Lighthouse CI
         uses: treosh/lighthouse-ci-action@v12
         with:
-          urls: ${{ needs.deploy.outputs.url }}
+          urls: |
+            ${{ needs.deploy.outputs.url }}
           configPath: ./lighthouserc.json
           uploadArtifacts: true
         env:
