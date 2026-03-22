@@ -11,7 +11,8 @@
     "check": "tsc --noEmit && eslint . && prettier . --check",
     "fix": "eslint . --fix && prettier . --write",
     "check-bundle-size": "bundlewatch",
-    "check-dead-links": "linkinator ./out --recurse --skip-external --verbosity error"
+    "check-dead-links": "linkinator ./out --recurse --skip-external --check-css --check-fragments --verbosity error",
+    "check-external-links": "linkinator ./out --recurse --check-css --check-fragments --retry --retry-errors --verbosity error"
   },
   "bundlewatch": {
     "files": [
