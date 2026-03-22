@@ -12,11 +12,6 @@ export const metadata: Metadata = {
   },
   description:
     "I'm Ying, a software engineer and founder based near Washington, D.C. I like creating quality software products that people are happy to use, and that coincidentally make companies lots of money.",
-  alternates: {
-    types: {
-      'application/rss+xml': `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/feed.xml`,
-    },
-  },
 }
 
 export default function RootLayout({
