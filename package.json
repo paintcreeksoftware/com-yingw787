@@ -10,12 +10,19 @@
     "lint": "eslint .",
     "check": "tsc --noEmit && eslint . && prettier . --check",
     "fix": "eslint . --fix && prettier . --write",
-    "check-bundle-size": "bundlewatch"
+    "check-bundle-size": "bundlewatch",
+    "check-dead-links": "linkinator ./out --recurse --skip-external --verbosity error"
   },
   "bundlewatch": {
     "files": [
-      { "path": ".next/static/chunks/*.js", "maxSize": "265kB" },
-      { "path": ".next/static/chunks/*.css", "maxSize": "31kB" }
+      {
+        "path": ".next/static/chunks/*.js",
+        "maxSize": "265kB"
+      },
+      {
+        "path": ".next/static/chunks/*.css",
+        "maxSize": "31kB"
+      }
     ]
   },
   "browserslist": "defaults, not ie <= 11",
@@ -51,6 +58,7 @@
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
+    "linkinator": "^7.6.1",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "sharp": "0.34.3"
