@@ -4,7 +4,7 @@ Personal portfolio website for Ying Wang — software engineer and founder based
 near Washington, D.C. Built on the [Tailwind Plus
 Spotlight](https://tailwindcss.com/plus) template with Next.js.
 
-**Live site:** https://yingw787.com
+**Live site:** <https://yingw787.com>
 
 ## Tech stack
 
@@ -57,7 +57,7 @@ npm run check-external-links  # verify external links
 
 ## Project structure
 
-```
+```text
 src/
 ├── app/           # Next.js App Router pages
 │   ├── page.tsx   # Homepage (hero, testimonials, social links)
