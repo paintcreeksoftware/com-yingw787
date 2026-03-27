@@ -21,10 +21,6 @@ echo "Updating sysctl configuration..."
 sudo sysctl fs.inotify.max_user_watches=524288
 sudo sysctl fs.inotify.max_user_instances=8192
 
-# Create `.env.local`. Update environment file definition if base env file
-# `.env.sample` changes.
-cp .env.sample .env.local
-
 popd || exit 1
 
 # Install system dependencies as exact.
