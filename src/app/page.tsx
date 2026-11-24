@@ -12,15 +12,10 @@ import { SocialLink } from '@/components/SocialLink'
 import { TestimonialSection } from '@/components/TestimonialSection'
 
 import portrait300Jpeg from '@/images/portrait/portrait-300.jpeg'
-import portrait300Webp from '@/images/portrait/portrait-300.webp'
 import portrait420Jpeg from '@/images/portrait/portrait-420.jpeg'
-import portrait420Webp from '@/images/portrait/portrait-420.webp'
 import portrait600Jpeg from '@/images/portrait/portrait-600.jpeg'
-import portrait600Webp from '@/images/portrait/portrait-600.webp'
 import portrait900Jpeg from '@/images/portrait/portrait-900.jpeg'
-import portrait900Webp from '@/images/portrait/portrait-900.webp'
 import portrait1260Jpeg from '@/images/portrait/portrait-1260.jpeg'
-import portrait1260Webp from '@/images/portrait/portrait-1260.webp'
 import MikeEshelman from '@/images/picture_mike_eshelman.jpeg'
 import AlanMcKellar from '@/images/picture_alan_mckellar.png'
 import MikeSpainhower from '@/images/picture_mike_spainhower.jpg'
@@ -29,25 +24,15 @@ import DefaultAvatar from '@/images/picture_default_avatar.jpg'
 const portraitSizes =
   '(min-width: 78rem) 25.75rem, (min-width: 64rem) calc(50vw - 13.25rem), (min-width: 22rem) 18.75rem, calc(100vw - 3.25rem)'
 
-function portraitSrcSet(images: StaticImageData[]): string {
-  return images.map(({ src, width }) => `${src} ${width}w`).join(', ')
-}
-
-const portraitWebpSrcSet = portraitSrcSet([
-  portrait300Webp,
-  portrait420Webp,
-  portrait600Webp,
-  portrait900Webp,
-  portrait1260Webp,
-])
-
-const portraitJpegSrcSet = portraitSrcSet([
+const portraitSrcSet = [
   portrait300Jpeg,
   portrait420Jpeg,
   portrait600Jpeg,
   portrait900Jpeg,
   portrait1260Jpeg,
-])
+]
+  .map(({ src, width }) => `${src} ${width}w`)
+  .join(', ')
 
 interface TestimonialQuote {
   id: string
@@ -201,23 +186,17 @@ export default function Home() {
         <div className="grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12">
           <div className="lg:pl-20">
             <div className="max-w-xs px-2.5 lg:max-w-none">
-              <picture>
-                <source
-                  type="image/webp"
-                  srcSet={portraitWebpSrcSet}
-                  sizes={portraitSizes}
-                />
-                <img
-                  src={portrait420Jpeg.src}
-                  srcSet={portraitJpegSrcSet}
-                  sizes={portraitSizes}
-                  width={portrait420Jpeg.width}
-                  height={portrait420Jpeg.height}
-                  alt=""
-                  fetchPriority="high"
-                  className="aspect-square w-full rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
-                />
-              </picture>
+              {/* eslint-disable-next-line @next/next/no-img-element -- Next Image does not accept a custom srcSet with static export. */}
+              <img
+                src={portrait420Jpeg.src}
+                srcSet={portraitSrcSet}
+                sizes={portraitSizes}
+                width={portrait420Jpeg.width}
+                height={portrait420Jpeg.height}
+                alt=""
+                fetchPriority="high"
+                className="aspect-square w-full rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
+              />
             </div>
           </div>
           <div className="lg:order-first lg:row-span-2">
