@@ -43,6 +43,10 @@ npm run build        # generates static output in out/
 The `out/` directory is deployed to Firebase Hosting. Firebase config is in
 `firebase.json`.
 
+To regenerate the homepage portrait variants after changing
+`src/images/portrait.jpeg`, run `node scripts/generate-portrait.mjs` and commit
+the updated files in `src/images/portrait/`.
+
 ## Quality checks
 
 ```bash
