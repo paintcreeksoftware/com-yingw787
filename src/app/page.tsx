@@ -40,7 +40,10 @@ const testimonials: TestimonialQuote[] = [
     ),
     avatarImage: MikeEshelman,
     name: (
-      <a href="https://www.linkedin.com/in/eshelman" className="text-blue-600">
+      <a
+        href="https://www.linkedin.com/in/eshelman"
+        className="text-blue-600 dark:text-blue-400"
+      >
         Mike Eshelman
       </a>
     ),
@@ -62,7 +65,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/alanmckellar"
-        className="text-blue-600"
+        className="text-blue-600 dark:text-blue-400"
       >
         Alan McKellar
       </a>
@@ -90,7 +93,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/spainhower"
-        className="text-blue-600"
+        className="text-blue-600 dark:text-blue-400"
       >
         Mike Spainhower
       </a>
@@ -128,7 +131,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/lihan-zhang-3b24a594"
-        className="text-blue-600"
+        className="text-blue-600 dark:text-blue-400"
       >
         Lihan Zhang
       </a>
@@ -153,7 +156,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/addisonjones3"
-        className="text-blue-600"
+        className="text-blue-600 dark:text-blue-400"
       >
         Addison Jones
       </a>
