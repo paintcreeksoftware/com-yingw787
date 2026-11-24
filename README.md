@@ -68,8 +68,7 @@ src/
 │   ├── TestimonialSection.tsx
 │   └── ...
 ├── images/        # Avatars and static images
-├── lib/           # Utility functions
-└── styles/        # Global CSS and Prism syntax highlighting
+└── styles/        # Global CSS
 ```
 
 ## Environment variables
