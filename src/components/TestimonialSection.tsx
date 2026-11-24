@@ -43,7 +43,7 @@ export const TestimonialSection = ({
             alt=""
             sizes="3rem"
             className="h-12 w-12 rounded-full bg-gray-50"
-            priority
+            loading="lazy"
           />
           <div className="text-sm leading-6">
             {name && (

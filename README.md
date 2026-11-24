@@ -55,7 +55,7 @@ npm run lint               # ESLint
 npm run check              # types + lint + format (all at once)
 npm run fix                # auto-fix lint and formatting issues
 npm run check-bundle-size  # verify JS/CSS bundle limits (JS: 265kB, CSS: 31kB)
-npm run check-dead-links   # verify internal links
+npm run check-dead-links   # verify links (HTTP 429 counts as a pass)
 npm run check-external-links  # verify external links
 ```
 
@@ -72,8 +72,7 @@ src/
 │   ├── TestimonialSection.tsx
 │   └── ...
 ├── images/        # Avatars and static images
-├── lib/           # Utility functions
-└── styles/        # Global CSS and Prism syntax highlighting
+└── styles/        # Global CSS
 ```
 
 ## Environment variables
