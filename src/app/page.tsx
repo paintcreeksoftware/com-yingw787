@@ -40,7 +40,10 @@ const testimonials: TestimonialQuote[] = [
     ),
     avatarImage: MikeEshelman,
     name: (
-      <a href="https://www.linkedin.com/in/eshelman" className="text-blue-600">
+      <a
+        href="https://www.linkedin.com/in/eshelman"
+        className="text-blue-600 dark:text-blue-400"
+      >
         Mike Eshelman
       </a>
     ),
@@ -62,7 +65,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/alanmckellar"
-        className="text-blue-600"
+        className="text-blue-600 dark:text-blue-400"
       >
         Alan McKellar
       </a>
@@ -90,7 +93,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/spainhower"
-        className="text-blue-600"
+        className="text-blue-600 dark:text-blue-400"
       >
         Mike Spainhower
       </a>
@@ -128,7 +131,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/lihan-zhang-3b24a594"
-        className="text-blue-600"
+        className="text-blue-600 dark:text-blue-400"
       >
         Lihan Zhang
       </a>
@@ -153,7 +156,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/addisonjones3"
-        className="text-blue-600"
+        className="text-blue-600 dark:text-blue-400"
       >
         Addison Jones
       </a>
@@ -166,20 +169,8 @@ export default function Home() {
   return (
     <div>
       <Container className="mt-16 sm:mt-32">
-        <div className="grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12">
-          <div className="lg:pl-20">
-            <div className="max-w-xs px-2.5 lg:max-w-none">
-              <Image
-                src={portraitImage}
-                alt=""
-                sizes="(min-width: 1024px) 32rem, 20rem"
-                loading="eager"
-                fetchPriority="high"
-                className="aspect-square rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
-              />
-            </div>
-          </div>
-          <div className="lg:order-first lg:row-span-2">
+        <div className="grid grid-cols-1 gap-y-10 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12">
+          <div className="lg:row-span-2">
             <h1 className="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
               Need software?
             </h1>
@@ -189,31 +180,48 @@ export default function Home() {
               people are happy to use, and that coincidentally make companies
               lots of money.
             </div>
-            <div className="mt-6 flex gap-6">
+            <div className="mt-6 flex flex-wrap gap-2 lg:flex-nowrap lg:gap-6">
               <SocialLink
                 href="https://github.com/yingw787"
                 aria-label="Follow on GitHub"
                 icon={FaGithub}
+                label="GitHub"
               />
               <SocialLink
                 href="https://linkedin.com/in/yingw787"
                 aria-label="Follow on LinkedIn"
                 icon={FaLinkedin}
+                label="LinkedIn"
               />
               <SocialLink
                 href="https://blog.yingw787.com"
                 aria-label="Personal Blog"
                 icon={FaPersonHiking}
+                label="Personal Blog"
               />
               <SocialLink
                 href="https://bytes.yingw787.com"
                 aria-label="Professional Blog"
                 icon={FaPersonWalkingLuggage}
+                label="Professional Blog"
               />
               <SocialLink
                 href="mailto:ying@paintcreeksoftware.com"
                 aria-label="Email"
                 icon={FaEnvelope}
+                label="Email"
+              />
+            </div>
+          </div>
+          <div className="lg:pl-20">
+            <div className="max-w-xs px-2.5 lg:max-w-none">
+              <Image
+                src={portraitImage}
+                alt=""
+                sizes="(min-width: 1024px) 32rem, 20rem"
+                loading="eager"
+                fetchPriority="high"
+                className="aspect-square rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
               />
             </div>
           </div>
