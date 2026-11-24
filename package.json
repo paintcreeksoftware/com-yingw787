@@ -12,8 +12,8 @@
     "check": "tsc --noEmit && eslint . && prettier . --check && markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
     "fix": "eslint . --fix && prettier . --write",
     "check-bundle-size": "bundlewatch",
-    "check-dead-links": "linkinator ./out --recurse --skip-external --check-css --check-fragments --verbosity error",
-    "check-external-links": "linkinator ./out --recurse --check-css --check-fragments --retry --retry-errors --verbosity error"
+    "check-dead-links": "linkinator ./out --recurse --check-css --check-fragments --status-code 429:warn --verbosity error",
+    "check-external-links": "linkinator ./out --recurse --check-css --check-fragments --retry --retry-errors --status-code 429:warn --verbosity error"
   },
   "bundlewatch": {
     "files": [
@@ -31,17 +31,11 @@
   "dependencies": {
     "@headlessui/react": "^2.2.6",
     "@heroicons/react": "^2.2.0",
-    "@mdx-js/loader": "^3.1.0",
-    "@mdx-js/react": "^3.1.0",
     "@tailwindcss/postcss": "^4.2.0",
-    "@tailwindcss/typography": "^0.5.16",
     "@types/webpack-env": "^1.18.8",
-    "cheerio": "^1.1.2",
     "clsx": "^2.1.1",
-    "fast-glob": "^3.3.3",
-    "feed": "^5.1.0",
     "heroicons": "^2.2.0",
-    "next": "16.1.6",
+    "next": "16.4.5",
     "next-themes": "^0.4.6",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -61,13 +55,23 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "linkinator": "^7.6.1",
-    "markdownlint-cli2": "^0.22.0",
+    "markdownlint-cli2": "^0.24.2",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "sharp": "0.34.3"
+    "sharp": "0.35.5",
+    "typescript-eslint": "8.73.0"
   },
   "overrides": {
     "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3"
+    "@types/react-dom": "19.2.3",
+    "bundlewatch": {
+      "axios": "^0.34.0"
+    },
+    "linkinator": {
+      "glob": "^14.0.2"
+    },
+    "micromark-extension-math": {
+      "katex": "^0.18.2"
+    }
   }
 }
