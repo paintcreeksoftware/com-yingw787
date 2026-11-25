@@ -19,7 +19,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm start -- --listen tcp://127.0.0.1:4173',
+    command:
+      'npm start -- --config ../tests/serve.json --listen tcp://127.0.0.1:4173',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: !isCI,
   },

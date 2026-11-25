@@ -2,6 +2,7 @@ name: Check dead links
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 concurrency:
@@ -12,6 +13,7 @@ jobs:
   check-dead-links:
     name: Check dead links
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
