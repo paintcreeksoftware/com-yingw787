@@ -1,0 +1,40 @@
+name: Publish to AWS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-aws
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main' && vars.AWS_HOSTING_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_PAGER: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+      - run: node --test infra/aws/site/tests/*.test.mjs
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_HOSTING_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_HOSTING_REGION }}
+      - run: node infra/aws/site/publish.mjs
+        env:
+          SITE_BUCKET: ${{ vars.AWS_HOSTING_BUCKET }}
+          DISTRIBUTION_ID: ${{ vars.AWS_HOSTING_DISTRIBUTION_ID }}
