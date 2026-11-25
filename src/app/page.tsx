@@ -244,7 +244,7 @@ export default function Home() {
           </div>
         </div>
       </Container>
-      <Container>
+      <Container className="max-lg:mt-12">
         {testimonials.map((testimonial) => {
           return (
             <TestimonialSection
