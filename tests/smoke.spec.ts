@@ -783,6 +783,47 @@ test.describe('Dark scheme without JavaScript', () => {
 })
 
 test.describe('404 page', () => {
+  for (const viewport of [
+    { width: 375, height: 812 },
+    { width: 1440, height: 900 },
+  ]) {
+    test(`centers the content at ${viewport.width}px`, async ({ page }) => {
+      await page.setViewportSize(viewport)
+      await page.goto('/this-page-does-not-exist')
+
+      const label = await page.getByText('404', { exact: true }).boundingBox()
+      const button = await page
+        .getByRole('link', { name: 'Go back home' })
+        .boundingBox()
+      if (!label || !button) throw new Error('404 content is not visible')
+
+      const center = (label.y + button.y + button.height) / 2
+      expect(Math.abs(center - viewport.height / 2)).toBeLessThanOrEqual(2)
+    })
+  }
+
+  test('keeps the content in view in short landscape', async ({ page }) => {
+    await page.setViewportSize({ width: 812, height: 375 })
+    await page.goto('/this-page-does-not-exist')
+    await expect(
+      page.getByRole('link', { name: 'Go back home' }),
+    ).toBeInViewport({ ratio: 1 })
+  })
+
+  test('renders the avatar as a circular block with hover feedback', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await page.goto('/this-page-does-not-exist')
+    const avatar = page.getByRole('link', { name: 'Home', exact: true })
+
+    await expect(avatar).toHaveCSS('display', 'block')
+    await expect(avatar).toHaveCSS('opacity', '1')
+    await avatar.hover()
+    await expect(avatar).toHaveCSS('opacity', '0.8')
+    await expect(avatar).toHaveCSS('transition-duration', '0s')
+  })
+
   test('keeps a home button border in forced colors', async ({ page }) => {
     await page.emulateMedia({ forcedColors: 'active' })
     const response = await page.goto('/this-page-does-not-exist')
