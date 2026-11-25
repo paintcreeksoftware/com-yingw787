@@ -6,11 +6,17 @@ on:
       - 'infra/aws/**'
       - '.github/workflows/terraform.yml'
       - 'firebase.json'
+      - 'next.config.mjs'
+      - 'package-lock.json'
+      - 'package.json'
   pull_request:
     paths:
       - 'infra/aws/**'
       - '.github/workflows/terraform.yml'
       - 'firebase.json'
+      - 'next.config.mjs'
+      - 'package-lock.json'
+      - 'package.json'
 
 permissions:
   contents: read

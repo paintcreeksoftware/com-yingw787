@@ -27,13 +27,46 @@ terraform -chdir=infra/aws/site plan -var='site_bucket_name=YOUR_SITE_BUCKET'
 The site state key is `yingw787.com/site.tfstate` in the default Terraform
 workspace. The backend uses native S3 lockfiles. Do not commit state or plans.
 
+For a plan-only identity, attach [the site plan IAM policy](site/plan-policy.json)
+after filling in the bucket names, AWS account ID, hosted zone ID and any
+existing generated resource IDs (use the suffix of the certificate ARN for
+its ID). If a resource does not exist yet, use `*` just for its generated ID
+and narrow the ARN once it has been provisioned. The policy requires a
+dedicated state bucket: it lists that bucket, reads only the site state object,
+and can write or delete only the corresponding lockfile. It cannot apply a
+plan, modify DNS or publish the site. AWS STS `GetCallerIdentity` is called
+but requires no grant. The policy is for the site root; provisioning the
+state bucket is a separate operator step. Prefer short-lived credentials.
+
 ## Preview
 
-After approval, apply a reviewed plan and publish the Next static export
-to the private site bucket with Firebase's cache-control metadata. Verify
-the CloudFront hostname from `terraform output`: HTTPS, the home page, the
-real 404 page with a 404 status, assets, and headers. This config does not change
-the existing Firebase deployment.
+After approval, apply a reviewed site plan and use the manual publish workflow
+below. Verify the CloudFront hostname from `terraform output`: HTTPS, the home
+page, the real 404 page with a 404 status, assets, and headers. This config does
+not change the existing Firebase deployment.
+
+## Manual publish
+
+If the account already has the IAM provider for `token.actions.githubusercontent.com`
+with `sts.amazonaws.com` as an audience, set `github_oidc_provider_arn` to reuse it.
+Otherwise Terraform creates the provider. The publish role trusts only this
+repository's `main` branch and needs no GitHub AWS access-key secret.
+
+After approval to publish to the AWS preview, set the GitHub repository
+variables below using the site root's Terraform outputs:
+
+| Variable                      | Site output        |
+| ----------------------------- | ------------------ |
+| `AWS_HOSTING_ROLE_ARN`        | `publish_role_arn` |
+| `AWS_HOSTING_REGION`          | `site_region`      |
+| `AWS_HOSTING_BUCKET`          | `site_bucket_name` |
+| `AWS_HOSTING_DISTRIBUTION_ID` | `distribution_id`  |
+
+Then explicitly set `AWS_HOSTING_ENABLED` to `true` and run **Publish to AWS**
+manually from `main`. Pushes never trigger it. Publishing copies the current
+Next.js export, removes obsolete mutable keys, and invalidates CloudFront.
+Previously published fingerprinted assets are retained for cached clients;
+they can be pruned by an operator once those caches have expired.
 
 ## Custom domain and DNS cutover
 
