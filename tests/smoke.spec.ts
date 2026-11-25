@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright'
 import { type Locator, type Page, expect, test } from '@playwright/test'
 
 interface RuntimeErrors {
@@ -57,6 +58,85 @@ function trackRuntimeErrors(
 
   return errors
 }
+
+test.describe('Accessibility structure', () => {
+  for (const { path, status, firstContentLink } of [
+    { path: '/', status: 200, firstContentLink: 'Follow on GitHub' },
+    {
+      path: '/this-page-does-not-exist',
+      status: 404,
+      firstContentLink: 'Go back home',
+    },
+  ]) {
+    test(`passes WCAG A/AA axe checks on ${path}`, async ({ page }) => {
+      const response = await page.goto(path)
+      expect(response?.status()).toBe(status)
+
+      const { violations } = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze()
+
+      expect(violations).toEqual([])
+    })
+
+    test(`skips directly to main content on ${path}`, async ({ page }) => {
+      await page.goto(path)
+
+      const skipLink = page.getByRole('link', { name: 'Skip to content' })
+      await page.keyboard.press('Tab')
+      await expect(skipLink).toBeFocused()
+      await page.keyboard.press('Enter')
+      await expect(page).toHaveURL(`${path}#main-content`)
+      await expect(page.getByRole('main')).toBeFocused()
+      await page.keyboard.press('Tab')
+      await expect(
+        page.getByRole('link', { name: firstContentLink }),
+      ).toBeFocused()
+    })
+  }
+
+  test('exposes homepage text structure and hides decorative social icons', async ({
+    page,
+  }) => {
+    await page.goto('/')
+
+    await expect
+      .soft(page.getByRole('link', { name: 'Home', exact: true }))
+      .toHaveAttribute('aria-current', 'page')
+    await expect
+      .soft(page.getByRole('paragraph').filter({ hasText: "I'm Ying" }))
+      .toHaveCount(1)
+
+    const testimonials = page.getByRole('region', { name: 'Testimonials' })
+    await expect
+      .soft(
+        testimonials.getByRole('heading', { level: 2, name: 'Testimonials' }),
+      )
+      .toHaveCount(1)
+    await expect
+      .soft(testimonials.locator('article figure blockquote'))
+      .toHaveCount(6)
+
+    const socialIcons = page
+      .getByRole('link', {
+        name: /^(Follow on GitHub|Follow on LinkedIn|Personal Blog|Professional Blog|Email)$/,
+      })
+      .locator('svg')
+    await expect(socialIcons).toHaveCount(5)
+    await expect
+      .soft(socialIcons.and(page.locator('[aria-hidden="true"]')))
+      .toHaveCount(5)
+  })
+
+  test('does not mark the Home avatar as current on the 404 page', async ({
+    page,
+  }) => {
+    await page.goto('/this-page-does-not-exist')
+    await expect(
+      page.getByRole('link', { name: 'Home', exact: true }),
+    ).not.toHaveAttribute('aria-current', 'page')
+  })
+})
 
 test.describe('Homepage', () => {
   test('hydrates /index.html with the same header avatar as /', async ({
