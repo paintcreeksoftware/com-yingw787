@@ -1,4 +1,4 @@
-import Image, { type StaticImageData } from 'next/image'
+import type { StaticImageData } from 'next/image'
 import {
   FaLinkedin,
   FaGithub,
@@ -11,11 +11,28 @@ import { Container } from '@/components/Container'
 import { SocialLink } from '@/components/SocialLink'
 import { TestimonialSection } from '@/components/TestimonialSection'
 
-import portraitImage from '@/images/portrait.jpeg'
+import portrait300Jpeg from '@/images/portrait/portrait-300.jpeg'
+import portrait420Jpeg from '@/images/portrait/portrait-420.jpeg'
+import portrait600Jpeg from '@/images/portrait/portrait-600.jpeg'
+import portrait900Jpeg from '@/images/portrait/portrait-900.jpeg'
+import portrait1260Jpeg from '@/images/portrait/portrait-1260.jpeg'
 import MikeEshelman from '@/images/picture_mike_eshelman.webp'
 import AlanMcKellar from '@/images/picture_alan_mckellar.webp'
 import MikeSpainhower from '@/images/picture_mike_spainhower.webp'
 import DefaultAvatar from '@/images/picture_default_avatar.webp'
+
+const portraitSizes =
+  '(min-width: 78rem) 25.75rem, (min-width: 64rem) calc(50vw - 13.25rem), (min-width: 22rem) 18.75rem, calc(100vw - 3.25rem)'
+
+const portraitSrcSet = [
+  portrait300Jpeg,
+  portrait420Jpeg,
+  portrait600Jpeg,
+  portrait900Jpeg,
+  portrait1260Jpeg,
+]
+  .map(({ src, width }) => `${src} ${width}w`)
+  .join(', ')
 
 interface TestimonialQuote {
   id: string
@@ -215,13 +232,17 @@ export default function Home() {
           </div>
           <div className="lg:pl-20">
             <div className="max-w-xs px-2.5 lg:max-w-none">
-              <Image
-                src={portraitImage}
+              {/* eslint-disable-next-line @next/next/no-img-element -- Next Image does not accept a custom srcSet with static export. */}
+              <img
+                src={portrait420Jpeg.src}
+                srcSet={portraitSrcSet}
+                sizes={portraitSizes}
+                width={portrait420Jpeg.width}
+                height={portrait420Jpeg.height}
                 alt=""
-                sizes="(min-width: 1024px) 32rem, 20rem"
                 loading="eager"
                 fetchPriority="high"
-                className="aspect-square rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
+                className="aspect-square w-full rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
               />
             </div>
           </div>
