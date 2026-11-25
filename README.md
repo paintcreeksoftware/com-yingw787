@@ -54,6 +54,10 @@ To regenerate the homepage portrait variants after changing
 `src/images/portrait.jpeg`, run `node scripts/generate-portrait.mjs` and commit
 the updated files in `src/images/portrait/`.
 
+To regenerate the header avatar variants after changing `src/images/avatar.webp`,
+run `node scripts/generate-header-avatar.mjs` and commit the updated files in
+`src/images/avatar/`.
+
 ## Quality checks
 
 ```bash
