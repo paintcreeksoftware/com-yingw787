@@ -13,8 +13,8 @@
     "fix": "eslint . --fix && prettier . --write",
     "check-bundle-size": "bundlewatch",
     "check-licenses": "licensee --production --errors-only",
-    "check-dead-links": "linkinator ./out --recurse --check-css --check-fragments --status-code 429:warn --verbosity error",
-    "check-external-links": "linkinator ./out --recurse --check-css --check-fragments --retry --retry-errors --status-code 429:warn --verbosity error",
+    "check-dead-links": "linkinator ./out --recurse --check-css --check-fragments --timeout 15000 --status-code 429:warn --verbosity error",
+    "check-external-links": "linkinator ./out --recurse --check-css --check-fragments --timeout 15000 --retry --retry-errors --status-code 429:warn --verbosity error",
     "test:smoke": "playwright test"
   },
   "bundlewatch": {
