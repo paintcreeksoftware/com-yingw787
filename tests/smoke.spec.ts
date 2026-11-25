@@ -149,6 +149,15 @@ test.describe('Homepage', () => {
 })
 
 test.describe('404 page', () => {
+  test('serves the exported page at its clean URL', async ({ page }) => {
+    const response = await page.goto('/404')
+    expect(response?.status()).toBe(200)
+    await expect(page).toHaveURL('/404')
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Page not found' }),
+    ).toBeVisible()
+  })
+
   test('renders 404 page with no overflow and navigates back home', async ({
     page,
   }) => {

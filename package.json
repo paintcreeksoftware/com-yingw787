@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "serve out",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
@@ -60,6 +60,7 @@
     "markdownlint-cli2": "^0.24.2",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "serve": "14.2.8",
     "sharp": "0.35.5",
     "typescript-eslint": "8.73.0"
   },

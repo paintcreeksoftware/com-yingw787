@@ -19,7 +19,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'node tests/serve-out.mjs',
+    command: 'npm start -- --listen tcp://127.0.0.1:4173',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: !isCI,
   },
