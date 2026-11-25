@@ -27,7 +27,7 @@ export const TestimonialSection = ({
   testimonial: Testimonial
 }) => {
   return (
-    <article className="py-6 sm:py-8 dark:bg-zinc-900">
+    <article className="py-6 sm:py-8">
       <figure className="mx-auto max-w-2xl">
         <p className="sr-only">{`${STAR_RATING} out of ${STAR_RATING} stars`}</p>
         <div className="flex gap-x-1 text-[#c38300] dark:text-yellow-500">

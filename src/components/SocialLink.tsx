@@ -19,7 +19,7 @@ export function SocialLink({
     >
       <Icon
         aria-hidden="true"
-        className="size-4 shrink-0 fill-zinc-500 transition group-hover:fill-zinc-600 lg:size-6 dark:fill-zinc-400 dark:group-hover:fill-zinc-300"
+        className="size-4 shrink-0 fill-zinc-500 transition group-hover:fill-zinc-600 motion-reduce:transition-none lg:size-6 dark:fill-zinc-400 dark:group-hover:fill-zinc-300"
       />
       <span className="min-w-0 text-xs font-medium text-zinc-700 lg:hidden dark:text-zinc-200">
         {label}

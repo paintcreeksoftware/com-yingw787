@@ -23,7 +23,7 @@ export default function NotFound() {
         <Link
           href="/"
           prefetch={false}
-          className="mt-4 inline-flex items-center justify-center gap-2 rounded-md border border-zinc-500 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 active:bg-zinc-100 active:text-zinc-900/60 active:transition-none dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-50 dark:focus-visible:outline-zinc-100 dark:active:bg-zinc-800/50 dark:active:text-zinc-50/70 forced-colors:border-[ButtonText]"
+          className="mt-4 inline-flex items-center justify-center gap-2 rounded-md border border-zinc-500 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 active:bg-zinc-100 active:text-zinc-900/60 active:transition-none motion-reduce:transition-none dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-50 dark:focus-visible:outline-zinc-100 dark:active:bg-zinc-800/50 dark:active:text-zinc-50/70 forced-colors:border-[ButtonText]"
         >
           Go back home
         </Link>

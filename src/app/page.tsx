@@ -176,8 +176,8 @@ export default function Home() {
         fetchPriority="high"
       />
       <Container className="mt-8 sm:mt-16 lg:mt-32">
-        <div className="grid grid-cols-1 gap-y-10 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12">
-          <div className="lg:row-span-2">
+        <div className="grid grid-cols-1 gap-y-10 lg:grid-cols-2">
+          <div>
             <h1 className="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl lg:max-xl:text-[2.75rem]/tight dark:text-zinc-100">
               Need software?
             </h1>
@@ -220,7 +220,7 @@ export default function Home() {
               />
             </div>
           </div>
-          <div className="lg:pl-20">
+          <div className="lg:mb-12 lg:pl-20">
             <div className="max-w-xs px-2.5 sm:max-lg:mx-auto lg:max-w-none">
               <picture>
                 <source
@@ -245,7 +245,10 @@ export default function Home() {
         </div>
       </Container>
       <Container className="max-lg:mt-12">
-        <section aria-labelledby="testimonials-heading">
+        <section
+          aria-labelledby="testimonials-heading"
+          className="dark:bg-zinc-900"
+        >
           <h2 id="testimonials-heading" className="sr-only">
             Testimonials
           </h2>
