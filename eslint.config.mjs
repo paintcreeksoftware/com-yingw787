@@ -210,6 +210,13 @@ export default tseslint.config([
 
   // Ignore build artifacts
   {
-    ignores: ['.next/**', 'out/**', 'build/**', 'node_modules/**'],
+    ignores: [
+      '.next/**',
+      'out/**',
+      'build/**',
+      'node_modules/**',
+      'playwright-report/**',
+      'test-results/**',
+    ],
   },
 ])
