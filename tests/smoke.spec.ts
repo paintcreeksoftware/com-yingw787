@@ -115,6 +115,11 @@ test.describe('Homepage', () => {
     }
 
     await expect(page.locator('blockquote')).toHaveCount(6)
+    await expect(
+      page
+        .locator('blockquote')
+        .filter({ hasText: "integrations I've worked on" }),
+    ).toBeVisible()
 
     const images = page.locator('img')
     const imageCount = await images.count()
