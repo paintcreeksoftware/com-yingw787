@@ -1,4 +1,3 @@
-import type { StaticImageData } from 'next/image'
 import {
   FaLinkedin,
   FaGithub,
@@ -9,7 +8,10 @@ import {
 
 import { Container } from '@/components/Container'
 import { SocialLink } from '@/components/SocialLink'
-import { TestimonialSection } from '@/components/TestimonialSection'
+import {
+  TestimonialSection,
+  type Testimonial,
+} from '@/components/TestimonialSection'
 
 import portrait300Jpeg from '@/images/portrait/portrait-300.jpeg'
 import portrait420Jpeg from '@/images/portrait/portrait-420.jpeg'
@@ -45,18 +47,7 @@ const portraitJpegSrcSet = [
   .map(({ src, width }) => `${src} ${width}w`)
   .join(', ')
 
-const testimonialLinkClassName =
-  'rounded-sm text-blue-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:text-blue-400 dark:focus-visible:outline-zinc-100'
-
-interface TestimonialQuote {
-  id: string
-  quote: React.ReactNode
-  avatarImage?: StaticImageData
-  name?: React.ReactNode
-  role?: React.ReactNode
-}
-
-const testimonials: TestimonialQuote[] = [
+const testimonials: Testimonial[] = [
   {
     id: 'mike-eshelman',
     quote: (
@@ -70,15 +61,11 @@ const testimonials: TestimonialQuote[] = [
       </>
     ),
     avatarImage: MikeEshelman,
-    name: (
-      <a
-        href="https://www.linkedin.com/in/eshelman"
-        className={testimonialLinkClassName}
-      >
-        Mike Eshelman
-      </a>
-    ),
-    role: <>fmr. CMO of Mr. Cooper (acq. Rocket Companies)</>,
+    author: {
+      name: 'Mike Eshelman',
+      profileUrl: 'https://www.linkedin.com/in/eshelman',
+    },
+    role: 'fmr. CMO of Mr. Cooper (acq. Rocket Companies)',
   },
   {
     id: 'alan-mckellar',
@@ -93,15 +80,11 @@ const testimonials: TestimonialQuote[] = [
       </>
     ),
     avatarImage: AlanMcKellar,
-    name: (
-      <a
-        href="https://www.linkedin.com/in/alanmckellar"
-        className={testimonialLinkClassName}
-      >
-        Alan McKellar
-      </a>
-    ),
-    role: <>fmr. VP of Engineering at Janus Health</>,
+    author: {
+      name: 'Alan McKellar',
+      profileUrl: 'https://www.linkedin.com/in/alanmckellar',
+    },
+    role: 'fmr. VP of Engineering at Janus Health',
   },
   {
     id: 'mike-spainhower',
@@ -121,15 +104,11 @@ const testimonials: TestimonialQuote[] = [
       </>
     ),
     avatarImage: MikeSpainhower,
-    name: (
-      <a
-        href="https://www.linkedin.com/in/spainhower"
-        className={testimonialLinkClassName}
-      >
-        Mike Spainhower
-      </a>
-    ),
-    role: <>fmr. CTO of Caribou</>,
+    author: {
+      name: 'Mike Spainhower',
+      profileUrl: 'https://www.linkedin.com/in/spainhower',
+    },
+    role: 'fmr. CTO of Caribou',
   },
   {
     id: 'vp-acquisition-marketing',
@@ -142,7 +121,7 @@ const testimonials: TestimonialQuote[] = [
         they&apos;re stuck with [legacy solutions].
       </>
     ),
-    role: <>VP of Acquisition Marketing, Series F security startup</>,
+    role: 'VP of Acquisition Marketing, Series F security startup',
   },
   {
     id: 'lihan-zhang',
@@ -157,15 +136,11 @@ const testimonials: TestimonialQuote[] = [
         not be the engineer I am today without his guidance.
       </>
     ),
-    name: (
-      <a
-        href="https://www.linkedin.com/in/lihan-zhang-3b24a594"
-        className={testimonialLinkClassName}
-      >
-        Lihan Zhang
-      </a>
-    ),
-    role: <>Software Engineer</>,
+    author: {
+      name: 'Lihan Zhang',
+      profileUrl: 'https://www.linkedin.com/in/lihan-zhang-3b24a594',
+    },
+    role: 'Software Engineer',
   },
   {
     id: 'addison-jones',
@@ -181,15 +156,11 @@ const testimonials: TestimonialQuote[] = [
         recommendation for Ying as both an engineer, leader, and friend.
       </>
     ),
-    name: (
-      <a
-        href="https://www.linkedin.com/in/addisonjones3"
-        className={testimonialLinkClassName}
-      >
-        Addison Jones
-      </a>
-    ),
-    role: <>Software Engineer</>,
+    author: {
+      name: 'Addison Jones',
+      profileUrl: 'https://www.linkedin.com/in/addisonjones3',
+    },
+    role: 'Software Engineer',
   },
 ]
 
@@ -278,17 +249,12 @@ export default function Home() {
           <h2 id="testimonials-heading" className="sr-only">
             Testimonials
           </h2>
-          {testimonials.map((testimonial) => {
-            return (
-              <TestimonialSection
-                key={testimonial.id}
-                quote={testimonial.quote}
-                avatarImage={testimonial.avatarImage}
-                name={testimonial.name}
-                role={testimonial.role}
-              />
-            )
-          })}
+          {testimonials.map((testimonial) => (
+            <TestimonialSection
+              key={testimonial.id}
+              testimonial={testimonial}
+            />
+          ))}
         </section>
       </Container>
     </div>
