@@ -437,6 +437,133 @@ test.describe('Homepage', () => {
       .poll(() => photo.evaluate((img: HTMLImageElement) => img.naturalWidth))
       .toBeGreaterThan(0)
   })
+
+  test('shows shape-matched focus-visible rings on keyboard navigation', async ({
+    page,
+  }) => {
+    const readFocusRing = (locator: Locator) =>
+      locator.evaluate((element) => {
+        const style = getComputedStyle(element)
+        const canvas = document.createElement('canvas')
+        canvas.width = canvas.height = 1
+        const context = canvas.getContext('2d')
+        if (!context) {
+          throw new Error('Could not measure focus outline color')
+        }
+        context.fillStyle = style.outlineColor
+        context.fillRect(0, 0, 1, 1)
+        return {
+          display: style.display,
+          outlineStyle: style.outlineStyle,
+          outlineWidth: style.outlineWidth,
+          outlineOffset: style.outlineOffset,
+          borderRadius: parseFloat(style.borderRadius),
+          outlineColor: Array.from(context.getImageData(0, 0, 1, 1).data),
+        }
+      })
+
+    const expectedRingColor = {
+      light: [24, 24, 27, 255],
+      dark: [244, 244, 245, 255],
+    } as const
+    const tabToSkipLink = async () => {
+      await page.keyboard.press('Tab')
+      await expect(
+        page.getByRole('link', { name: 'Skip to content' }),
+      ).toBeFocused()
+    }
+
+    for (const scheme of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme: scheme })
+      await page.setViewportSize({ width: 1280, height: 800 })
+      await page.goto('/', { waitUntil: 'networkidle' })
+
+      await tabToSkipLink()
+      await page.keyboard.press('Tab')
+      const homeAvatar = page.getByRole('link', { name: 'Home', exact: true })
+      await expect(homeAvatar).toBeFocused()
+      const homeAvatarRing = await readFocusRing(homeAvatar)
+      expect(homeAvatarRing).toMatchObject({
+        display: 'block',
+        outlineStyle: 'solid',
+        outlineWidth: '2px',
+        outlineOffset: '2px',
+        outlineColor: expectedRingColor[scheme],
+      })
+      expect(homeAvatarRing.borderRadius).toBeGreaterThanOrEqual(9999)
+
+      await page.keyboard.press('Tab')
+      const githubLink = page.getByRole('link', { name: 'Follow on GitHub' })
+      await expect(githubLink).toBeFocused()
+      expect(await readFocusRing(githubLink)).toMatchObject({
+        outlineStyle: 'solid',
+        outlineWidth: '2px',
+        outlineOffset: '2px',
+        borderRadius: 6,
+        outlineColor: expectedRingColor[scheme],
+      })
+
+      for (let i = 0; i < 5; i += 1) {
+        await page.keyboard.press('Tab')
+      }
+      const testimonialLink = page.getByRole('link', { name: 'Mike Eshelman' })
+      await expect(testimonialLink).toBeFocused()
+      expect(await readFocusRing(testimonialLink)).toMatchObject({
+        outlineStyle: 'solid',
+        outlineWidth: '2px',
+        outlineOffset: '2px',
+        borderRadius: 4,
+        outlineColor: expectedRingColor[scheme],
+      })
+
+      await page.setViewportSize({ width: 390, height: 844 })
+      await page.goto('/', { waitUntil: 'networkidle' })
+      await tabToSkipLink()
+      await page.keyboard.press('Tab')
+      await page.keyboard.press('Tab')
+      const mobileGithubLink = page.getByRole('link', {
+        name: 'Follow on GitHub',
+      })
+      await expect(mobileGithubLink).toBeFocused()
+      const mobileRing = await readFocusRing(mobileGithubLink)
+      expect(mobileRing).toMatchObject({
+        outlineStyle: 'solid',
+        outlineWidth: '2px',
+        outlineOffset: '2px',
+        outlineColor: expectedRingColor[scheme],
+      })
+      expect(mobileRing.borderRadius).toBeGreaterThanOrEqual(9999)
+
+      await page.setViewportSize({ width: 1280, height: 800 })
+      await page.goto('/404', { waitUntil: 'networkidle' })
+      await tabToSkipLink()
+      await page.keyboard.press('Tab')
+      const smallAvatar = page.getByRole('link', { name: 'Home', exact: true })
+      await expect(smallAvatar).toBeFocused()
+      const smallAvatarRing = await readFocusRing(smallAvatar)
+      expect(smallAvatarRing).toMatchObject({
+        display: 'block',
+        outlineStyle: 'solid',
+        outlineWidth: '2px',
+        outlineOffset: '2px',
+        outlineColor: expectedRingColor[scheme],
+      })
+      expect(smallAvatarRing.borderRadius).toBeGreaterThanOrEqual(9999)
+
+      await page.keyboard.press('Tab')
+      const backButton = page.getByRole('link', { name: 'Go back home' })
+      await expect(backButton).toBeFocused()
+      await expect
+        .poll(() => readFocusRing(backButton))
+        .toMatchObject({
+          outlineStyle: 'solid',
+          outlineWidth: '2px',
+          outlineOffset: '2px',
+          borderRadius: 6,
+          outlineColor: expectedRingColor[scheme],
+        })
+    }
+  })
 })
 
 test.describe('Dark scheme without JavaScript', () => {

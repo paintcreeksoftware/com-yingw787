@@ -33,6 +33,9 @@ const portraitSrcSet = [
   .map(({ src, width }) => `${src} ${width}w`)
   .join(', ')
 
+const testimonialLinkClassName =
+  'rounded-sm text-blue-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:text-blue-400 dark:focus-visible:outline-zinc-100'
+
 interface TestimonialQuote {
   id: string
   quote: React.ReactNode
@@ -58,7 +61,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/eshelman"
-        className="text-blue-600 dark:text-blue-400"
+        className={testimonialLinkClassName}
       >
         Mike Eshelman
       </a>
@@ -81,7 +84,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/alanmckellar"
-        className="text-blue-600 dark:text-blue-400"
+        className={testimonialLinkClassName}
       >
         Alan McKellar
       </a>
@@ -109,7 +112,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/spainhower"
-        className="text-blue-600 dark:text-blue-400"
+        className={testimonialLinkClassName}
       >
         Mike Spainhower
       </a>
@@ -145,7 +148,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/lihan-zhang-3b24a594"
-        className="text-blue-600 dark:text-blue-400"
+        className={testimonialLinkClassName}
       >
         Lihan Zhang
       </a>
@@ -169,7 +172,7 @@ const testimonials: TestimonialQuote[] = [
     name: (
       <a
         href="https://www.linkedin.com/in/addisonjones3"
-        className="text-blue-600 dark:text-blue-400"
+        className={testimonialLinkClassName}
       >
         Addison Jones
       </a>

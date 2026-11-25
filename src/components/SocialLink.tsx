@@ -14,7 +14,7 @@ export function SocialLink({
 }) {
   return (
     <Link
-      className="group inline-flex min-h-11 max-w-full items-center gap-2 px-3 max-lg:rounded-full max-lg:bg-zinc-50 max-lg:py-2 max-lg:ring-1 max-lg:ring-zinc-200 max-lg:ring-inset max-lg:hover:bg-zinc-100 lg:-m-1 lg:block lg:min-h-0 lg:p-1 dark:max-lg:bg-zinc-800/50 dark:max-lg:ring-white/10 dark:max-lg:hover:bg-zinc-800"
+      className="group inline-flex min-h-11 max-w-full items-center gap-2 rounded-full px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 max-lg:bg-zinc-50 max-lg:py-2 max-lg:ring-1 max-lg:ring-zinc-200 max-lg:ring-inset max-lg:hover:bg-zinc-100 lg:-m-1 lg:block lg:min-h-0 lg:rounded-md lg:p-1 dark:focus-visible:outline-zinc-100 dark:max-lg:bg-zinc-800/50 dark:max-lg:ring-white/10 dark:max-lg:hover:bg-zinc-800"
       {...props}
     >
       <Icon
