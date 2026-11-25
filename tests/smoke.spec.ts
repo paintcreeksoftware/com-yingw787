@@ -331,6 +331,29 @@ test.describe('Homepage', () => {
     await expect(page.getByText('GitHub', { exact: true })).toBeHidden()
   })
 
+  test('starts the hero heading within the top quarter on mobile and tablet', async ({
+    page,
+  }) => {
+    await page.goto('/')
+
+    const heading = page.getByRole('heading', {
+      level: 1,
+      name: 'Need software?',
+    })
+    for (const [width, height] of [
+      [320, 568],
+      [375, 667],
+      [768, 1024],
+    ]) {
+      await page.setViewportSize({ width, height })
+      await expect(heading).toBeVisible()
+      const top = await heading.evaluate(
+        (element) => element.getBoundingClientRect().top,
+      )
+      expect(top, `Heading top at ${width}×${height}`).toBeLessThan(height / 4)
+    }
+  })
+
   test('reflows social link pills within their container at 200% text zoom on narrow viewports', async ({
     page,
   }) => {
