@@ -9,7 +9,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <div className="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20" />
         </div>
       </div>
-      <div className="relative flex w-full flex-col">
+      <div className="group/layout relative flex w-full flex-col has-[main>[data-not-found]]:grid has-[main>[data-not-found]]:grid-rows-[minmax(min-content,1fr)_auto_minmax(min-content,1fr)]">
         <Header />
         <main className="flex-auto">{children}</main>
         <Footer />

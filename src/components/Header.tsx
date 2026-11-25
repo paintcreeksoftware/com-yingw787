@@ -59,7 +59,10 @@ export function Header() {
         <div className="h-16 pt-6">
           <Container>
             <AvatarContainer>
-              <Avatar prefetch={false} />
+              <Avatar
+                prefetch={false}
+                className="block rounded-full hover:opacity-80 motion-safe:transition-opacity"
+              />
             </AvatarContainer>
           </Container>
         </div>
