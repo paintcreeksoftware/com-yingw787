@@ -291,6 +291,16 @@ test.describe('Dark scheme without JavaScript', () => {
 })
 
 test.describe('404 page', () => {
+  test('keeps a home button border in forced colors', async ({ page }) => {
+    await page.emulateMedia({ forcedColors: 'active' })
+    const response = await page.goto('/this-page-does-not-exist')
+    expect(response?.status()).toBe(404)
+
+    const homeButton = page.getByRole('link', { name: 'Go back home' })
+    await expect(homeButton).toHaveCSS('border-top-style', 'solid')
+    await expect(homeButton).toHaveCSS('border-top-width', '1px')
+  })
+
   test('serves the exported page at its clean URL', async ({ page }) => {
     const response = await page.goto('/404')
     expect(response?.status()).toBe(200)
