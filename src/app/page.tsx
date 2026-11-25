@@ -12,10 +12,10 @@ import { SocialLink } from '@/components/SocialLink'
 import { TestimonialSection } from '@/components/TestimonialSection'
 
 import portraitImage from '@/images/portrait.jpeg'
-import MikeEshelman from '@/images/picture_mike_eshelman.jpeg'
-import AlanMcKellar from '@/images/picture_alan_mckellar.png'
-import MikeSpainhower from '@/images/picture_mike_spainhower.jpg'
-import DefaultAvatar from '@/images/picture_default_avatar.jpg'
+import MikeEshelman from '@/images/picture_mike_eshelman.webp'
+import AlanMcKellar from '@/images/picture_alan_mckellar.webp'
+import MikeSpainhower from '@/images/picture_mike_spainhower.webp'
+import DefaultAvatar from '@/images/picture_default_avatar.webp'
 
 interface TestimonialQuote {
   id: string
@@ -219,6 +219,8 @@ export default function Home() {
                 src={portraitImage}
                 alt=""
                 sizes="(min-width: 1024px) 32rem, 20rem"
+                loading="eager"
+                fetchPriority="high"
                 className="aspect-square rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
               />
             </div>
