@@ -59,7 +59,7 @@ export function Header() {
         <div className="h-16 pt-6">
           <Container>
             <AvatarContainer>
-              <Avatar />
+              <Avatar prefetch={false} />
             </AvatarContainer>
           </Container>
         </div>
