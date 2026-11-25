@@ -41,6 +41,12 @@ edit files in `src/`.
 npm run build        # generates static output in out/
 ```
 
+To preview the static export at <http://localhost:3000>:
+
+```bash
+npm run build && npm start
+```
+
 The `out/` directory is deployed to Firebase Hosting. Firebase config is in
 `firebase.json`.
 
