@@ -168,6 +168,10 @@ test.describe('404 page', () => {
     const response = await page.goto(missingPath, { waitUntil: 'networkidle' })
     expect(response?.status()).toBe(404)
 
+    await expect(page).toHaveTitle('Page not found - Ying Wang')
+    await expect(
+      page.locator('meta[name="robots"][content="noindex"]'),
+    ).toHaveCount(1)
     await expect(
       page.getByRole('heading', { level: 1, name: 'Page not found' }),
     ).toBeVisible()
