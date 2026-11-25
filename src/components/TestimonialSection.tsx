@@ -27,7 +27,7 @@ export const TestimonialSection = ({
   testimonial: Testimonial
 }) => {
   return (
-    <section className="px-6 py-6 sm:py-8 lg:px-4 dark:bg-zinc-900">
+    <article className="py-6 sm:py-8 dark:bg-zinc-900">
       <figure className="mx-auto max-w-2xl">
         <p className="sr-only">{`${STAR_RATING} out of ${STAR_RATING} stars`}</p>
         <div className="flex gap-x-1 text-[#c38300] dark:text-yellow-500">
@@ -64,7 +64,7 @@ export const TestimonialSection = ({
               <div className="font-semibold text-zinc-800 dark:text-zinc-100">
                 <a
                   href={author.profileUrl}
-                  className="text-blue-600 dark:text-blue-400"
+                  className="rounded-sm text-blue-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:text-blue-400 dark:focus-visible:outline-zinc-100"
                 >
                   {author.name}
                 </a>
@@ -76,6 +76,6 @@ export const TestimonialSection = ({
           </div>
         </figcaption>
       </figure>
-    </section>
+    </article>
   )
 }
