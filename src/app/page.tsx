@@ -66,7 +66,7 @@ const testimonials: TestimonialQuote[] = [
         Mike Eshelman
       </a>
     ),
-    role: <>fmr. CMO of Mr.Cooper (acq. Rocket Mortgage)</>,
+    role: <>fmr. CMO of Mr. Cooper (acq. Rocket Companies)</>,
   },
   {
     id: 'alan-mckellar',
@@ -190,12 +190,12 @@ export default function Home() {
             <h1 className="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
               Need software?
             </h1>
-            <div className="mt-6 space-y-7 text-base text-zinc-600 dark:text-zinc-400">
+            <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
               I&apos;m Ying, a software engineer and founder based near
               Washington, D.C. I like creating quality software products that
               people are happy to use, and that coincidentally make companies
               lots of money.
-            </div>
+            </p>
             <div className="mt-6 flex flex-wrap gap-2 lg:flex-nowrap lg:gap-6">
               <SocialLink
                 href="https://github.com/yingw787"
@@ -248,17 +248,22 @@ export default function Home() {
         </div>
       </Container>
       <Container>
-        {testimonials.map((testimonial) => {
-          return (
-            <TestimonialSection
-              key={testimonial.id}
-              quote={testimonial.quote}
-              avatarImage={testimonial.avatarImage}
-              name={testimonial.name}
-              role={testimonial.role}
-            />
-          )
-        })}
+        <section aria-labelledby="testimonials-heading">
+          <h2 id="testimonials-heading" className="sr-only">
+            Testimonials
+          </h2>
+          {testimonials.map((testimonial) => {
+            return (
+              <TestimonialSection
+                key={testimonial.id}
+                quote={testimonial.quote}
+                avatarImage={testimonial.avatarImage}
+                name={testimonial.name}
+                role={testimonial.role}
+              />
+            )
+          })}
+        </section>
       </Container>
     </div>
   )

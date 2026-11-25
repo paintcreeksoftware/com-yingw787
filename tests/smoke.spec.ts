@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright'
 import { type Locator, type Page, expect, test } from '@playwright/test'
 
 interface RuntimeErrors {
@@ -58,7 +59,111 @@ function trackRuntimeErrors(
   return errors
 }
 
+test.describe('Accessibility structure', () => {
+  for (const { path, status, firstContentLink } of [
+    { path: '/', status: 200, firstContentLink: 'Follow on GitHub' },
+    {
+      path: '/this-page-does-not-exist',
+      status: 404,
+      firstContentLink: 'Go back home',
+    },
+  ]) {
+    test(`passes WCAG A/AA axe checks on ${path}`, async ({ page }) => {
+      const response = await page.goto(path)
+      expect(response?.status()).toBe(status)
+
+      const { violations } = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze()
+
+      expect(violations).toEqual([])
+    })
+
+    test(`skips directly to main content on ${path}`, async ({ page }) => {
+      await page.goto(path)
+
+      const skipLink = page.getByRole('link', { name: 'Skip to content' })
+      await page.keyboard.press('Tab')
+      await expect(skipLink).toBeFocused()
+      await page.keyboard.press('Enter')
+      await expect(page).toHaveURL(`${path}#main-content`)
+      await expect(page.getByRole('main')).toBeFocused()
+      await page.keyboard.press('Tab')
+      await expect(
+        page.getByRole('link', { name: firstContentLink }),
+      ).toBeFocused()
+    })
+  }
+
+  test('exposes homepage text structure and hides decorative social icons', async ({
+    page,
+  }) => {
+    await page.goto('/')
+
+    await expect
+      .soft(page.getByRole('link', { name: 'Home', exact: true }))
+      .toHaveAttribute('aria-current', 'page')
+    await expect
+      .soft(page.getByRole('paragraph').filter({ hasText: "I'm Ying" }))
+      .toHaveCount(1)
+
+    const testimonials = page.getByRole('region', { name: 'Testimonials' })
+    await expect
+      .soft(
+        testimonials.getByRole('heading', { level: 2, name: 'Testimonials' }),
+      )
+      .toHaveCount(1)
+    await expect
+      .soft(testimonials.locator('article figure blockquote'))
+      .toHaveCount(6)
+
+    const socialIcons = page
+      .getByRole('link', {
+        name: /^(Follow on GitHub|Follow on LinkedIn|Personal Blog|Professional Blog|Email)$/,
+      })
+      .locator('svg')
+    await expect(socialIcons).toHaveCount(5)
+    await expect
+      .soft(socialIcons.and(page.locator('[aria-hidden="true"]')))
+      .toHaveCount(5)
+  })
+
+  test('does not mark the Home avatar as current on the 404 page', async ({
+    page,
+  }) => {
+    await page.goto('/this-page-does-not-exist')
+    await expect(
+      page.getByRole('link', { name: 'Home', exact: true }),
+    ).not.toHaveAttribute('aria-current', 'page')
+  })
+})
+
 test.describe('Homepage', () => {
+  test('hydrates /index.html with the same header avatar as /', async ({
+    page,
+  }) => {
+    const avatar = page
+      .getByRole('link', { name: 'Home', exact: true })
+      .locator('img')
+
+    await page.goto('/', { waitUntil: 'networkidle' })
+    await expect(avatar).toBeVisible()
+    const homeAvatar = await avatar.boundingBox()
+
+    const errors = trackRuntimeErrors(page)
+    const response = await page.goto('/index.html', {
+      waitUntil: 'networkidle',
+    })
+    expect(response?.status()).toBe(200)
+    await expect(page).toHaveURL('/index.html')
+    await expect(avatar).toBeVisible()
+
+    expect.soft(errors.consoleErrors).toEqual([])
+    expect.soft(errors.pageErrors).toEqual([])
+    expect.soft(errors.failedRequests).toEqual([])
+    expect.soft(await avatar.boundingBox()).toEqual(homeAvatar)
+  })
+
   test('does not prefetch its own route', async ({ page }) => {
     const prefetchRequests: string[] = []
     page.on('request', (request) => {
@@ -138,6 +243,15 @@ test.describe('Homepage', () => {
     expect(errors.failedRequests).toEqual([])
   })
 
+  test('names Mr. Cooper and its acquirer in the Eshelman caption', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await expect(
+      page.locator('figcaption').filter({ hasText: 'Mike Eshelman' }),
+    ).toContainText('fmr. CMO of Mr. Cooper (acq. Rocket Companies)')
+  })
+
   test('has no horizontal overflow on mobile and desktop viewports', async ({
     page,
   }) => {
@@ -156,6 +270,56 @@ test.describe('Homepage', () => {
     )
     expect(desktopOverflow).toBe(false)
     await expect(page.getByText('GitHub', { exact: true })).toBeHidden()
+  })
+
+  test('reflows social link pills within their container at 200% text zoom on narrow viewports', async ({
+    page,
+  }) => {
+    const socialLinkNames = [
+      'Follow on GitHub',
+      'Follow on LinkedIn',
+      'Personal Blog',
+      'Professional Blog',
+      'Email',
+    ]
+
+    for (const width of [320, 375]) {
+      await page.setViewportSize({ width, height: 800 })
+      await page.goto('/', { waitUntil: 'networkidle' })
+      await page.addStyleTag({
+        content: 'html { font-size: 200% !important; }',
+      })
+
+      const containerBox = await page
+        .getByRole('link', { name: 'Follow on GitHub' })
+        .locator('..')
+        .boundingBox()
+      expect(containerBox).not.toBeNull()
+
+      for (const name of socialLinkNames) {
+        const link = page.getByRole('link', { name })
+        const linkBox = await link.boundingBox()
+        const labelBox = await link.locator('span').boundingBox()
+
+        expect(linkBox).not.toBeNull()
+        expect(labelBox).not.toBeNull()
+
+        if (containerBox && linkBox && labelBox) {
+          expect(
+            linkBox.x + linkBox.width,
+            `${name} pill overflows container at ${width}px`,
+          ).toBeLessThanOrEqual(containerBox.x + containerBox.width + 0.5)
+          expect(
+            linkBox.x + linkBox.width,
+            `${name} pill overflows viewport at ${width}px`,
+          ).toBeLessThanOrEqual(width + 0.5)
+          expect(
+            labelBox.x + labelBox.width,
+            `${name} label overflows pill at ${width}px`,
+          ).toBeLessThanOrEqual(linkBox.x + linkBox.width + 0.5)
+        }
+      }
+    }
   })
 
   test('applies light and dark color schemes', async ({ page }) => {
@@ -302,12 +466,19 @@ test.describe('Homepage', () => {
       light: [24, 24, 27, 255],
       dark: [244, 244, 245, 255],
     } as const
+    const tabToSkipLink = async () => {
+      await page.keyboard.press('Tab')
+      await expect(
+        page.getByRole('link', { name: 'Skip to content' }),
+      ).toBeFocused()
+    }
 
     for (const scheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme: scheme })
       await page.setViewportSize({ width: 1280, height: 800 })
       await page.goto('/', { waitUntil: 'networkidle' })
 
+      await tabToSkipLink()
       await page.keyboard.press('Tab')
       const homeAvatar = page.getByRole('link', { name: 'Home', exact: true })
       await expect(homeAvatar).toBeFocused()
@@ -347,6 +518,7 @@ test.describe('Homepage', () => {
 
       await page.setViewportSize({ width: 390, height: 844 })
       await page.goto('/', { waitUntil: 'networkidle' })
+      await tabToSkipLink()
       await page.keyboard.press('Tab')
       await page.keyboard.press('Tab')
       const mobileGithubLink = page.getByRole('link', {
@@ -364,6 +536,7 @@ test.describe('Homepage', () => {
 
       await page.setViewportSize({ width: 1280, height: 800 })
       await page.goto('/404', { waitUntil: 'networkidle' })
+      await tabToSkipLink()
       await page.keyboard.press('Tab')
       const smallAvatar = page.getByRole('link', { name: 'Home', exact: true })
       await expect(smallAvatar).toBeFocused()
@@ -428,6 +601,10 @@ test.describe('404 page', () => {
     const response = await page.goto(missingPath, { waitUntil: 'networkidle' })
     expect(response?.status()).toBe(404)
 
+    const avatar = page
+      .getByRole('link', { name: 'Home', exact: true })
+      .locator('img')
+    await expect(avatar).toHaveCSS('width', '36px')
     await expect(page).toHaveTitle('Page not found - Ying Wang')
     await expect(
       page.locator('meta[name="robots"][content="noindex"]'),
@@ -446,6 +623,7 @@ test.describe('404 page', () => {
 
     await page.getByRole('link', { name: 'Go back home' }).click()
     await expect(page).toHaveURL('/')
+    await expect(avatar).toHaveCSS('width', '64px')
     await expect(
       page.getByRole('heading', { level: 1, name: 'Need software?' }),
     ).toBeVisible()
