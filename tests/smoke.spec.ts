@@ -59,6 +59,49 @@ function trackRuntimeErrors(
   return errors
 }
 
+test.describe('Header avatar', () => {
+  for (const deviceScaleFactor of [1, 2, 3]) {
+    test.describe(`${deviceScaleFactor}x`, () => {
+      test.use({ deviceScaleFactor })
+
+      for (const { path, width } of [
+        { path: '/', width: 64 },
+        { path: '/this-page-does-not-exist', width: 36 },
+      ]) {
+        test(`loads only the matching avatar variant on ${path}`, async ({
+          page,
+        }) => {
+          const avatarRequests: string[] = []
+          page.on('request', (request) => {
+            const { pathname } = new URL(request.url())
+            if (/\/avatar[-.][^/]+\.webp$/.test(pathname)) {
+              avatarRequests.push(pathname)
+            }
+          })
+
+          await page.goto(path, { waitUntil: 'networkidle' })
+          const avatar = page.locator('header a[aria-label="Home"] img')
+          const currentSrc = await avatar.evaluate(
+            async (image: HTMLImageElement) => {
+              await image.decode()
+              return new URL(image.currentSrc).pathname
+            },
+          )
+          const variantWidth = width * deviceScaleFactor
+          const variantName =
+            variantWidth === 192 ? 'avatar' : `avatar-${variantWidth}`
+
+          await expect(avatar).toHaveCSS('width', `${width}px`)
+          expect(currentSrc).toMatch(
+            new RegExp(`/media/${variantName}\\.[^/]+\\.webp$`),
+          )
+          expect(avatarRequests).toEqual([currentSrc])
+        })
+      }
+    })
+  }
+})
+
 test.describe('Accessibility structure', () => {
   for (const { path, status, firstContentLink } of [
     { path: '/', status: 200, firstContentLink: 'Follow on GitHub' },
