@@ -17,9 +17,12 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
       - uses: preactjs/compressed-size-action@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          # The action installs before each build; reuse the PR's install for
+          # the base build when the lockfile is unchanged.
+          install-script: >-
+            bash -c "test -d node_modules && git diff --quiet ${{ github.sha }} -- package-lock.json || npm ci"
           build-script: build
           pattern: '.next/static/**/*.{js,css}'
