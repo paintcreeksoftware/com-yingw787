@@ -61,7 +61,9 @@ npm run typecheck          # TypeScript type check
 npm run lint               # ESLint
 npm run check              # types + lint + format (all at once)
 npm run fix                # auto-fix lint and formatting issues
+npm run test:smoke         # run browser smoke tests against the static export (build first)
 npm run check-bundle-size  # verify JS/CSS bundle limits (JS: 265kB, CSS: 31kB)
+npm run check-licenses     # check production dependency licenses
 npm run check-dead-links   # verify links (HTTP 429 counts as a pass)
 npm run check-external-links  # verify external links
 ```
@@ -74,7 +76,7 @@ src/
 │   ├── page.tsx   # Homepage (hero, testimonials, social links)
 │   └── layout.tsx # Root layout
 ├── components/    # Reusable React components
-│   ├── Header.tsx         # Animated avatar header
+│   ├── Header.tsx         # Renders an avatar that links to the homepage
 │   ├── Footer.tsx
 │   ├── TestimonialSection.tsx
 │   └── ...
