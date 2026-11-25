@@ -158,6 +158,56 @@ test.describe('Homepage', () => {
     await expect(page.getByText('GitHub', { exact: true })).toBeHidden()
   })
 
+  test('reflows social link pills within their container at 200% text zoom on narrow viewports', async ({
+    page,
+  }) => {
+    const socialLinkNames = [
+      'Follow on GitHub',
+      'Follow on LinkedIn',
+      'Personal Blog',
+      'Professional Blog',
+      'Email',
+    ]
+
+    for (const width of [320, 375]) {
+      await page.setViewportSize({ width, height: 800 })
+      await page.goto('/', { waitUntil: 'networkidle' })
+      await page.addStyleTag({
+        content: 'html { font-size: 200% !important; }',
+      })
+
+      const containerBox = await page
+        .getByRole('link', { name: 'Follow on GitHub' })
+        .locator('..')
+        .boundingBox()
+      expect(containerBox).not.toBeNull()
+
+      for (const name of socialLinkNames) {
+        const link = page.getByRole('link', { name })
+        const linkBox = await link.boundingBox()
+        const labelBox = await link.locator('span').boundingBox()
+
+        expect(linkBox).not.toBeNull()
+        expect(labelBox).not.toBeNull()
+
+        if (containerBox && linkBox && labelBox) {
+          expect(
+            linkBox.x + linkBox.width,
+            `${name} pill overflows container at ${width}px`,
+          ).toBeLessThanOrEqual(containerBox.x + containerBox.width + 0.5)
+          expect(
+            linkBox.x + linkBox.width,
+            `${name} pill overflows viewport at ${width}px`,
+          ).toBeLessThanOrEqual(width + 0.5)
+          expect(
+            labelBox.x + labelBox.width,
+            `${name} label overflows pill at ${width}px`,
+          ).toBeLessThanOrEqual(linkBox.x + linkBox.width + 0.5)
+        }
+      }
+    }
+  })
+
   test('applies light and dark color schemes', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'light' })
     await page.goto('/', { waitUntil: 'networkidle' })
