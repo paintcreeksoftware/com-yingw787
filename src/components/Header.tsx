@@ -36,8 +36,8 @@ function Avatar({
   large?: boolean
 }) {
   const variants = large
-    ? [avatar64, avatar128, avatarImage]
-    : [avatar36, avatar72, avatar108]
+    ? ([avatar64, avatar128, avatarImage] as const)
+    : ([avatar36, avatar72, avatar108] as const)
   const { src, width, height } = variants[0]
   const srcSet = variants
     .map((image, index) => `${image.src} ${index + 1}x`)

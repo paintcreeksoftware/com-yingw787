@@ -388,7 +388,7 @@ test.describe('Homepage', () => {
       [320, 568],
       [375, 667],
       [768, 1024],
-    ]) {
+    ] as const) {
       await page.setViewportSize({ width, height })
       await expect(heading).toBeVisible()
       const top = await heading.evaluate(
