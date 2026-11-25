@@ -17,7 +17,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
           Skip to content
         </a>
         <Header />
-        <main id="main-content" tabIndex={-1} className="flex-auto">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-auto focus:outline-none"
+        >
           {children}
         </main>
         <Footer />
