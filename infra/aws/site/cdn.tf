@@ -76,6 +76,7 @@ resource "aws_cloudfront_response_headers_policy" "site" {
 
 resource "aws_cloudfront_distribution" "site" {
   comment         = local.domain
+  aliases         = sort(tolist(local.custom_domains))
   enabled         = true
   is_ipv6_enabled = true
   http_version    = "http2and3"
@@ -118,7 +119,10 @@ resource "aws_cloudfront_distribution" "site" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = !var.enable_custom_domain
+    acm_certificate_arn            = one(aws_acm_certificate_validation.site[*].certificate_arn)
+    ssl_support_method             = var.enable_custom_domain ? "sni-only" : null
+    minimum_protocol_version       = var.enable_custom_domain ? "TLSv1.2_2021" : null
   }
 }
 

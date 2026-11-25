@@ -35,6 +35,42 @@ the CloudFront hostname from `terraform output`: HTTPS, the home page, the
 real 404 page with a 404 status, assets, and headers. This config does not change
 the existing Firebase deployment.
 
+## Custom domain and DNS cutover
+
+The domain already uses a public Route 53 zone with a Firebase apex A record
+(`199.36.158.100`, TTL 60) and unrelated records, including mail. Do not create a
+replacement zone or change registrar delegation. Verify that the existing
+zone's nameservers match `dig NS yingw787.com +short`. Leave `enable_www = false`
+unless approved: `www.yingw787.com` is currently NXDOMAIN.
+
+1. After approval to provision, set `route53_zone_id` to the existing public zone
+   ID and `enable_custom_domain = true` in your local site variables. Keep
+   `dns_target = "unmanaged"`. Review and apply a saved site plan. This creates
+   ACM validation CNAMEs, issues a certificate in `us-east-1`, and attaches it
+   and the apex domain to CloudFront without touching traffic records. If an
+   ACM CNAME already exists, import it rather than overwriting it.
+2. Publish the export and verify the CloudFront hostname. Test the custom
+   domain before changing DNS by replacing the placeholder in
+   `curl --connect-to yingw787.com:443:CLOUDFRONT_HOST:443 https://yingw787.com/`.
+3. **Only after Ying approves the cutover**, set `dns_target = "cloudfront"` in
+   your site variables and import the existing apex A record. This records its
+   current value in Terraform state without changing DNS:
+
+   ```sh
+   terraform -chdir=infra/aws/site import 'aws_route53_record.apex_ipv4[0]' 'YOUR_ZONE_ID_yingw787.com_A'
+   ```
+
+   Use the same site variables for import, plan and apply. The cutover plan
+   should update the apex A record in place and add an apex AAAA alias; if
+   opted in, it also adds www A and AAAA aliases. Review and apply the saved
+   plan, then verify authoritative DNS, HTTPS and the site. Keep Firebase
+   hosting available during the rollback window.
+
+4. To roll back, keep the custom domain enabled and set
+   `dns_target = "firebase"`, then review and apply the rollback plan. Verify
+   that Firebase still serves `199.36.158.100` for the apex before applying.
+   Do not revert to `unmanaged` while the apex is in Terraform state.
+
 ## Local checks
 
 ```sh
