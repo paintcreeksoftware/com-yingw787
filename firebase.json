@@ -34,7 +34,7 @@
         ]
       },
       {
-        "regex": "^/_next/static/media/[^/]+\\.[a-z0-9_-]{13}\\.(jpeg|webp)$",
+        "regex": "^/_next/static/media/[^/]+\\.[a-z0-9_-]{13}\\.(avif|jpeg|webp)$",
         "headers": [
           {
             "key": "Cache-Control",

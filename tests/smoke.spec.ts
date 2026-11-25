@@ -59,6 +59,22 @@ function trackRuntimeErrors(
 }
 
 test.describe('Homepage', () => {
+  test('downloads the portrait only once, as AVIF', async ({ page }) => {
+    const portraitRequests: string[] = []
+    page.on('request', (request) => {
+      const { pathname } = new URL(request.url())
+      if (/\/portrait-\d+\.[^/]+\.(avif|jpeg)$/.test(pathname)) {
+        portraitRequests.push(pathname)
+      }
+    })
+
+    await page.goto('/', { waitUntil: 'networkidle' })
+
+    expect(portraitRequests).toEqual([
+      expect.stringMatching(/\/portrait-420\.[^/]+\.avif$/),
+    ])
+  })
+
   test('does not prefetch its own route', async ({ page }) => {
     const prefetchRequests: string[] = []
     page.on('request', (request) => {

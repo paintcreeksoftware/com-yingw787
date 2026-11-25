@@ -23,7 +23,19 @@ import MikeSpainhower from '@/images/picture_mike_spainhower.webp'
 const portraitSizes =
   '(min-width: 78rem) 25.75rem, (min-width: 64rem) calc(50vw - 13.25rem), (min-width: 22rem) 18.75rem, calc(100vw - 3.25rem)'
 
-const portraitSrcSet = [
+const portraitAvifVariants = [
+  [new URL('../images/portrait/portrait-300.avif', import.meta.url), 300],
+  [new URL('../images/portrait/portrait-420.avif', import.meta.url), 420],
+  [new URL('../images/portrait/portrait-600.avif', import.meta.url), 600],
+  [new URL('../images/portrait/portrait-900.avif', import.meta.url), 900],
+  [new URL('../images/portrait/portrait-1260.avif', import.meta.url), 1260],
+] as const
+
+const portraitAvifSrcSet = portraitAvifVariants
+  .map(([url, width]) => `${url.pathname} ${width}w`)
+  .join(', ')
+
+const portraitJpegSrcSet = [
   portrait300Jpeg,
   portrait420Jpeg,
   portrait600Jpeg,
@@ -181,6 +193,14 @@ const testimonials: TestimonialQuote[] = [
 export default function Home() {
   return (
     <div>
+      <link
+        rel="preload"
+        as="image"
+        type="image/avif"
+        imageSrcSet={portraitAvifSrcSet}
+        imageSizes={portraitSizes}
+        fetchPriority="high"
+      />
       <Container className="mt-16 sm:mt-32">
         <div className="grid grid-cols-1 gap-y-10 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12">
           <div className="lg:row-span-2">
@@ -228,18 +248,24 @@ export default function Home() {
           </div>
           <div className="lg:pl-20">
             <div className="max-w-xs px-2.5 lg:max-w-none">
-              {/* eslint-disable-next-line @next/next/no-img-element -- Next Image does not accept a custom srcSet with static export. */}
-              <img
-                src={portrait420Jpeg.src}
-                srcSet={portraitSrcSet}
-                sizes={portraitSizes}
-                width={portrait420Jpeg.width}
-                height={portrait420Jpeg.height}
-                alt=""
-                loading="eager"
-                fetchPriority="high"
-                className="aspect-square w-full rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
-              />
+              <picture>
+                <source
+                  type="image/avif"
+                  srcSet={portraitAvifSrcSet}
+                  sizes={portraitSizes}
+                />
+                <img
+                  src={portrait420Jpeg.src}
+                  srcSet={portraitJpegSrcSet}
+                  sizes={portraitSizes}
+                  width={portrait420Jpeg.width}
+                  height={portrait420Jpeg.height}
+                  alt=""
+                  loading="eager"
+                  fetchPriority="high"
+                  className="aspect-square w-full rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
+                />
+              </picture>
             </div>
           </div>
         </div>
