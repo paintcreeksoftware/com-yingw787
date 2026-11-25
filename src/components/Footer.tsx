@@ -2,9 +2,9 @@ import { ContainerInner, ContainerOuter } from '@/components/Container'
 
 export function Footer() {
   return (
-    <footer className="mt-32 flex-none">
+    <footer className="mt-32 flex-none group-has-[main>[data-not-found]]/layout:mt-0 group-has-[main>[data-not-found]]/layout:self-end">
       <ContainerOuter>
-        <div className="border-t border-zinc-100 pt-10 pb-16 dark:border-zinc-700/40">
+        <div className="border-t border-zinc-100 pt-10 pb-16 dark:border-zinc-700/40 group-has-[main>[data-not-found]]/layout:[@media(max-height:30rem)]:pb-6">
           <ContainerInner>
             <div className="flex flex-col items-center justify-end gap-6 md:flex-row">
               <p className="text-sm text-zinc-500 dark:text-zinc-400">

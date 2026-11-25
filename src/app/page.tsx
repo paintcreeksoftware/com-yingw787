@@ -1,4 +1,3 @@
-import type { StaticImageData } from 'next/image'
 import {
   FaLinkedin,
   FaGithub,
@@ -9,7 +8,10 @@ import {
 
 import { Container } from '@/components/Container'
 import { SocialLink } from '@/components/SocialLink'
-import { TestimonialSection } from '@/components/TestimonialSection'
+import {
+  TestimonialSection,
+  type Testimonial,
+} from '@/components/TestimonialSection'
 
 import portrait300Jpeg from '@/images/portrait/portrait-300.jpeg'
 import portrait420Jpeg from '@/images/portrait/portrait-420.jpeg'
@@ -23,7 +25,19 @@ import MikeSpainhower from '@/images/picture_mike_spainhower.webp'
 const portraitSizes =
   '(min-width: 78rem) 25.75rem, (min-width: 64rem) calc(50vw - 13.25rem), (min-width: 22rem) 18.75rem, calc(100vw - 3.25rem)'
 
-const portraitSrcSet = [
+const portraitAvifVariants = [
+  [new URL('../images/portrait/portrait-300.avif', import.meta.url), 300],
+  [new URL('../images/portrait/portrait-420.avif', import.meta.url), 420],
+  [new URL('../images/portrait/portrait-600.avif', import.meta.url), 600],
+  [new URL('../images/portrait/portrait-900.avif', import.meta.url), 900],
+  [new URL('../images/portrait/portrait-1260.avif', import.meta.url), 1260],
+] as const
+
+const portraitAvifSrcSet = portraitAvifVariants
+  .map(([url, width]) => `${url.pathname} ${width}w`)
+  .join(', ')
+
+const portraitJpegSrcSet = [
   portrait300Jpeg,
   portrait420Jpeg,
   portrait600Jpeg,
@@ -33,15 +47,7 @@ const portraitSrcSet = [
   .map(({ src, width }) => `${src} ${width}w`)
   .join(', ')
 
-interface TestimonialQuote {
-  id: string
-  quote: React.ReactNode
-  avatarImage?: StaticImageData
-  name?: React.ReactNode
-  role?: React.ReactNode
-}
-
-const testimonials: TestimonialQuote[] = [
+const testimonials: Testimonial[] = [
   {
     id: 'mike-eshelman',
     quote: (
@@ -55,38 +61,30 @@ const testimonials: TestimonialQuote[] = [
       </>
     ),
     avatarImage: MikeEshelman,
-    name: (
-      <a
-        href="https://www.linkedin.com/in/eshelman"
-        className="text-blue-600 dark:text-blue-400"
-      >
-        Mike Eshelman
-      </a>
-    ),
-    role: <>fmr. CMO of Mr.Cooper (acq. Rocket Mortgage)</>,
+    author: {
+      name: 'Mike Eshelman',
+      profileUrl: 'https://www.linkedin.com/in/eshelman',
+    },
+    role: 'fmr. CMO of Mr. Cooper (acq. Rocket Companies)',
   },
   {
     id: 'alan-mckellar',
     quote: (
       <>
         You want the data engineering job done right? You want Ying. He is the
-        consummate professional who seeks to understand his customer&apos;s
-        needs and then implement innovative solutions. What I really enjoyed
-        about working with Ying is that I knew I could provide some high-level
-        requirements and step away to focus on other items. He always delivered
-        for me and my teams.
+        consummate professional who seeks to understand his customer’s needs and
+        then implement innovative solutions. What I really enjoyed about working
+        with Ying is that I knew I could provide some high-level requirements
+        and step away to focus on other items. He always delivered for me and my
+        teams.
       </>
     ),
     avatarImage: AlanMcKellar,
-    name: (
-      <a
-        href="https://www.linkedin.com/in/alanmckellar"
-        className="text-blue-600 dark:text-blue-400"
-      >
-        Alan McKellar
-      </a>
-    ),
-    role: <>fmr. VP of Engineering at Janus Health</>,
+    author: {
+      name: 'Alan McKellar',
+      profileUrl: 'https://www.linkedin.com/in/alanmckellar',
+    },
+    role: 'fmr. VP of Engineering at Janus Health',
   },
   {
     id: 'mike-spainhower',
@@ -100,21 +98,17 @@ const testimonials: TestimonialQuote[] = [
         depend on accurate and timely acquisition channel data. I was
         particularly impressed by the level of engagement that Ying brought to
         the project, collaborating with stakeholders to ensure that their needs
-        were met. Ying&apos;s ability to work seamlessly across functions and
+        were met. Ying’s ability to work seamlessly across functions and
         effectively apply technology to solve complex business issues is a
         testament to his exceptional engineering skills.
       </>
     ),
     avatarImage: MikeSpainhower,
-    name: (
-      <a
-        href="https://www.linkedin.com/in/spainhower"
-        className="text-blue-600 dark:text-blue-400"
-      >
-        Mike Spainhower
-      </a>
-    ),
-    role: <>fmr. CTO of Caribou</>,
+    author: {
+      name: 'Mike Spainhower',
+      profileUrl: 'https://www.linkedin.com/in/spainhower',
+    },
+    role: 'fmr. CTO of Caribou',
   },
   {
     id: 'vp-acquisition-marketing',
@@ -124,10 +118,10 @@ const testimonials: TestimonialQuote[] = [
         worked on is because of good attitudes from you and others and the
         willingness to come back to the table over and over again and clarify
         things through dialogue. A lot of companies never make it this far,
-        they&apos;re stuck with [legacy solutions].
+        they’re stuck with [legacy solutions].
       </>
     ),
-    role: <>VP of Acquisition Marketing, Series F security startup</>,
+    role: 'VP of Acquisition Marketing, Series F security startup',
   },
   {
     id: 'lihan-zhang',
@@ -142,15 +136,11 @@ const testimonials: TestimonialQuote[] = [
         not be the engineer I am today without his guidance.
       </>
     ),
-    name: (
-      <a
-        href="https://www.linkedin.com/in/lihan-zhang-3b24a594"
-        className="text-blue-600 dark:text-blue-400"
-      >
-        Lihan Zhang
-      </a>
-    ),
-    role: <>Software Engineer</>,
+    author: {
+      name: 'Lihan Zhang',
+      profileUrl: 'https://www.linkedin.com/in/lihan-zhang-3b24a594',
+    },
+    role: 'Software Engineer',
   },
   {
     id: 'addison-jones',
@@ -166,33 +156,37 @@ const testimonials: TestimonialQuote[] = [
         recommendation for Ying as both an engineer, leader, and friend.
       </>
     ),
-    name: (
-      <a
-        href="https://www.linkedin.com/in/addisonjones3"
-        className="text-blue-600 dark:text-blue-400"
-      >
-        Addison Jones
-      </a>
-    ),
-    role: <>Software Engineer</>,
+    author: {
+      name: 'Addison Jones',
+      profileUrl: 'https://www.linkedin.com/in/addisonjones3',
+    },
+    role: 'Software Engineer',
   },
 ]
 
 export default function Home() {
   return (
     <div>
-      <Container className="mt-16 sm:mt-32">
+      <link
+        rel="preload"
+        as="image"
+        type="image/avif"
+        imageSrcSet={portraitAvifSrcSet}
+        imageSizes={portraitSizes}
+        fetchPriority="high"
+      />
+      <Container className="mt-8 sm:mt-16 lg:mt-32">
         <div className="grid grid-cols-1 gap-y-10 lg:grid-cols-2">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
+            <h1 className="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl lg:max-xl:text-[2.75rem]/tight dark:text-zinc-100">
               Need software?
             </h1>
-            <div className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
-              I&apos;m Ying, a software engineer and founder based near
-              Washington, D.C. I like creating quality software products that
-              people are happy to use, and that coincidentally make companies
-              lots of money.
-            </div>
+            <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
+              I’m Ying, a software engineer and founder based near Washington,
+              D.C. I like creating quality software products that people are
+              happy to use, and that coincidentally make companies lots of
+              money.
+            </p>
             <div className="mt-6 flex flex-wrap gap-2 lg:flex-nowrap lg:gap-6">
               <SocialLink
                 href="https://github.com/yingw787"
@@ -227,35 +221,44 @@ export default function Home() {
             </div>
           </div>
           <div className="lg:mb-12 lg:pl-20">
-            <div className="max-w-xs px-2.5 lg:max-w-none">
-              {/* eslint-disable-next-line @next/next/no-img-element -- Next Image does not accept a custom srcSet with static export. */}
-              <img
-                src={portrait420Jpeg.src}
-                srcSet={portraitSrcSet}
-                sizes={portraitSizes}
-                width={portrait420Jpeg.width}
-                height={portrait420Jpeg.height}
-                alt=""
-                loading="eager"
-                fetchPriority="high"
-                className="aspect-square w-full rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
-              />
+            <div className="max-w-xs px-2.5 sm:max-lg:mx-auto lg:max-w-none">
+              <picture>
+                <source
+                  type="image/avif"
+                  srcSet={portraitAvifSrcSet}
+                  sizes={portraitSizes}
+                />
+                <img
+                  src={portrait420Jpeg.src}
+                  srcSet={portraitJpegSrcSet}
+                  sizes={portraitSizes}
+                  width={portrait420Jpeg.width}
+                  height={portrait420Jpeg.height}
+                  alt=""
+                  loading="eager"
+                  fetchPriority="high"
+                  className="aspect-square w-full rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
+                />
+              </picture>
             </div>
           </div>
         </div>
       </Container>
-      <Container>
-        <div className="dark:bg-zinc-900">
+      <Container className="max-lg:mt-12">
+        <section
+          aria-labelledby="testimonials-heading"
+          className="dark:bg-zinc-900"
+        >
+          <h2 id="testimonials-heading" className="sr-only">
+            Testimonials
+          </h2>
           {testimonials.map((testimonial) => (
             <TestimonialSection
               key={testimonial.id}
-              quote={testimonial.quote}
-              avatarImage={testimonial.avatarImage}
-              name={testimonial.name}
-              role={testimonial.role}
+              testimonial={testimonial}
             />
           ))}
-        </div>
+        </section>
       </Container>
     </div>
   )
