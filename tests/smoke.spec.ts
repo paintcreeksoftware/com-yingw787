@@ -1,4 +1,5 @@
 import { type Locator, type Page, expect, test } from '@playwright/test'
+import firebaseConfig from '../firebase.json'
 
 interface RuntimeErrors {
   consoleErrors: string[]
@@ -136,6 +137,49 @@ test.describe('Homepage', () => {
     expect(errors.consoleErrors).toEqual([])
     expect(errors.pageErrors).toEqual([])
     expect(errors.failedRequests).toEqual([])
+  })
+
+  test('parses Firebase Hosting security headers with no console warnings', async ({
+    page,
+  }) => {
+    const globalRule = firebaseConfig.hosting.headers.find(
+      (rule) => 'source' in rule && rule.source === '**',
+    )
+    expect(globalRule).toBeDefined()
+
+    const configuredHeaders = Object.fromEntries(
+      (globalRule?.headers ?? []).map(({ key, value }) => [key, value]),
+    )
+
+    await page.route('/', async (route) => {
+      const response = await route.fetch()
+      await route.fulfill({
+        response,
+        headers: {
+          ...response.headers(),
+          ...configuredHeaders,
+        },
+      })
+    })
+
+    const consoleWarnings: string[] = []
+    page.on('console', (message) => {
+      if (message.type() === 'warning') {
+        consoleWarnings.push(message.text())
+      }
+    })
+
+    const response = await page.goto('/', { waitUntil: 'networkidle' })
+    expect(response?.status()).toBe(200)
+    expect(consoleWarnings).toEqual([])
+    expect(response?.headers()['x-content-type-options']).toBe('nosniff')
+    expect(response?.headers()['referrer-policy']).toBe(
+      'strict-origin-when-cross-origin',
+    )
+    expect(response?.headers()['x-frame-options']).toBe('DENY')
+    expect(response?.headers()['permissions-policy']).toBe(
+      'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+    )
   })
 
   test('has no horizontal overflow on mobile and desktop viewports', async ({
