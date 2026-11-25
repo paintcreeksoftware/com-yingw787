@@ -11,7 +11,7 @@ export default function NotFound() {
         <h1 className="mt-4 text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
           Page not found
         </h1>
-        <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
+        <p className="mt-4 text-center text-base text-zinc-600 dark:text-zinc-400">
           Sorry, we couldn't find the page you're looking for.
         </p>
         <Button href="/" prefetch={false} variant="secondary" className="mt-4">
