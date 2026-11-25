@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright'
 import { type Locator, type Page, expect, test } from '@playwright/test'
 import firebaseConfig from '../firebase.json'
 
@@ -59,7 +60,170 @@ function trackRuntimeErrors(
   return errors
 }
 
+test.describe('Header avatar', () => {
+  for (const deviceScaleFactor of [1, 2, 3]) {
+    test.describe(`${deviceScaleFactor}x`, () => {
+      test.use({ deviceScaleFactor })
+
+      for (const { path, width } of [
+        { path: '/', width: 64 },
+        { path: '/this-page-does-not-exist', width: 36 },
+      ]) {
+        test(`loads only the matching avatar variant on ${path}`, async ({
+          page,
+        }) => {
+          const avatarRequests: string[] = []
+          page.on('request', (request) => {
+            const { pathname } = new URL(request.url())
+            if (/\/avatar[-.][^/]+\.webp$/.test(pathname)) {
+              avatarRequests.push(pathname)
+            }
+          })
+
+          await page.goto(path, { waitUntil: 'networkidle' })
+          const avatar = page.locator('header a[aria-label="Home"] img')
+          const currentSrc = await avatar.evaluate(
+            async (image: HTMLImageElement) => {
+              await image.decode()
+              return new URL(image.currentSrc).pathname
+            },
+          )
+          const variantWidth = width * deviceScaleFactor
+          const variantName =
+            variantWidth === 192 ? 'avatar' : `avatar-${variantWidth}`
+
+          await expect(avatar).toHaveCSS('width', `${width}px`)
+          expect(currentSrc).toMatch(
+            new RegExp(`/media/${variantName}\\.[^/]+\\.webp$`),
+          )
+          expect(avatarRequests).toEqual([currentSrc])
+        })
+      }
+    })
+  }
+})
+
+test.describe('Accessibility structure', () => {
+  for (const { path, status, firstContentLink } of [
+    { path: '/', status: 200, firstContentLink: 'Follow on GitHub' },
+    {
+      path: '/this-page-does-not-exist',
+      status: 404,
+      firstContentLink: 'Go back home',
+    },
+  ]) {
+    test(`passes WCAG A/AA axe checks on ${path}`, async ({ page }) => {
+      const response = await page.goto(path)
+      expect(response?.status()).toBe(status)
+
+      const { violations } = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze()
+
+      expect(violations).toEqual([])
+    })
+
+    test(`skips directly to main content on ${path}`, async ({ page }) => {
+      await page.goto(path)
+
+      const skipLink = page.getByRole('link', { name: 'Skip to content' })
+      await page.keyboard.press('Tab')
+      await expect(skipLink).toBeFocused()
+      await page.keyboard.press('Enter')
+      await expect(page).toHaveURL(`${path}#main-content`)
+      await expect(page.getByRole('main')).toBeFocused()
+      await page.keyboard.press('Tab')
+      await expect(
+        page.getByRole('link', { name: firstContentLink }),
+      ).toBeFocused()
+    })
+  }
+
+  test('exposes homepage text structure and hides decorative social icons', async ({
+    page,
+  }) => {
+    await page.goto('/')
+
+    await expect
+      .soft(page.getByRole('link', { name: 'Home', exact: true }))
+      .toHaveAttribute('aria-current', 'page')
+    await expect
+      .soft(page.getByRole('paragraph').filter({ hasText: "I'm Ying" }))
+      .toHaveCount(1)
+
+    const testimonials = page.getByRole('region', { name: 'Testimonials' })
+    await expect
+      .soft(
+        testimonials.getByRole('heading', { level: 2, name: 'Testimonials' }),
+      )
+      .toHaveCount(1)
+    await expect
+      .soft(testimonials.locator('article figure blockquote'))
+      .toHaveCount(6)
+
+    const socialIcons = page
+      .getByRole('link', {
+        name: /^(Follow on GitHub|Follow on LinkedIn|Personal Blog|Professional Blog|Email)$/,
+      })
+      .locator('svg')
+    await expect(socialIcons).toHaveCount(5)
+    await expect
+      .soft(socialIcons.and(page.locator('[aria-hidden="true"]')))
+      .toHaveCount(5)
+  })
+
+  test('does not mark the Home avatar as current on the 404 page', async ({
+    page,
+  }) => {
+    await page.goto('/this-page-does-not-exist')
+    await expect(
+      page.getByRole('link', { name: 'Home', exact: true }),
+    ).not.toHaveAttribute('aria-current', 'page')
+  })
+})
+
 test.describe('Homepage', () => {
+  test('downloads the portrait only once, as AVIF', async ({ page }) => {
+    const portraitRequests: string[] = []
+    page.on('request', (request) => {
+      const { pathname } = new URL(request.url())
+      if (/\/portrait-\d+\.[^/]+\.(avif|jpeg)$/.test(pathname)) {
+        portraitRequests.push(pathname)
+      }
+    })
+
+    await page.goto('/', { waitUntil: 'networkidle' })
+
+    expect(portraitRequests).toEqual([
+      expect.stringMatching(/\/portrait-420\.[^/]+\.avif$/),
+    ])
+  })
+
+  test('hydrates /index.html with the same header avatar as /', async ({
+    page,
+  }) => {
+    const avatar = page
+      .getByRole('link', { name: 'Home', exact: true })
+      .locator('img')
+
+    await page.goto('/', { waitUntil: 'networkidle' })
+    await expect(avatar).toBeVisible()
+    const homeAvatar = await avatar.boundingBox()
+
+    const errors = trackRuntimeErrors(page)
+    const response = await page.goto('/index.html', {
+      waitUntil: 'networkidle',
+    })
+    expect(response?.status()).toBe(200)
+    await expect(page).toHaveURL('/index.html')
+    await expect(avatar).toBeVisible()
+
+    expect.soft(errors.consoleErrors).toEqual([])
+    expect.soft(errors.pageErrors).toEqual([])
+    expect.soft(errors.failedRequests).toEqual([])
+    expect.soft(await avatar.boundingBox()).toEqual(homeAvatar)
+  })
+
   test('does not prefetch its own route', async ({ page }) => {
     const prefetchRequests: string[] = []
     page.on('request', (request) => {
@@ -182,6 +346,15 @@ test.describe('Homepage', () => {
     )
   })
 
+  test('names Mr. Cooper and its acquirer in the Eshelman caption', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await expect(
+      page.locator('figcaption').filter({ hasText: 'Mike Eshelman' }),
+    ).toContainText('fmr. CMO of Mr. Cooper (acq. Rocket Companies)')
+  })
+
   test('has no horizontal overflow on mobile and desktop viewports', async ({
     page,
   }) => {
@@ -200,6 +373,79 @@ test.describe('Homepage', () => {
     )
     expect(desktopOverflow).toBe(false)
     await expect(page.getByText('GitHub', { exact: true })).toBeHidden()
+  })
+
+  test('starts the hero heading within the top quarter on mobile and tablet', async ({
+    page,
+  }) => {
+    await page.goto('/')
+
+    const heading = page.getByRole('heading', {
+      level: 1,
+      name: 'Need software?',
+    })
+    for (const [width, height] of [
+      [320, 568],
+      [375, 667],
+      [768, 1024],
+    ]) {
+      await page.setViewportSize({ width, height })
+      await expect(heading).toBeVisible()
+      const top = await heading.evaluate(
+        (element) => element.getBoundingClientRect().top,
+      )
+      expect(top, `Heading top at ${width}×${height}`).toBeLessThan(height / 4)
+    }
+  })
+
+  test('reflows social link pills within their container at 200% text zoom on narrow viewports', async ({
+    page,
+  }) => {
+    const socialLinkNames = [
+      'Follow on GitHub',
+      'Follow on LinkedIn',
+      'Personal Blog',
+      'Professional Blog',
+      'Email',
+    ]
+
+    for (const width of [320, 375]) {
+      await page.setViewportSize({ width, height: 800 })
+      await page.goto('/', { waitUntil: 'networkidle' })
+      await page.addStyleTag({
+        content: 'html { font-size: 200% !important; }',
+      })
+
+      const containerBox = await page
+        .getByRole('link', { name: 'Follow on GitHub' })
+        .locator('..')
+        .boundingBox()
+      expect(containerBox).not.toBeNull()
+
+      for (const name of socialLinkNames) {
+        const link = page.getByRole('link', { name })
+        const linkBox = await link.boundingBox()
+        const labelBox = await link.locator('span').boundingBox()
+
+        expect(linkBox).not.toBeNull()
+        expect(labelBox).not.toBeNull()
+
+        if (containerBox && linkBox && labelBox) {
+          expect(
+            linkBox.x + linkBox.width,
+            `${name} pill overflows container at ${width}px`,
+          ).toBeLessThanOrEqual(containerBox.x + containerBox.width + 0.5)
+          expect(
+            linkBox.x + linkBox.width,
+            `${name} pill overflows viewport at ${width}px`,
+          ).toBeLessThanOrEqual(width + 0.5)
+          expect(
+            labelBox.x + labelBox.width,
+            `${name} label overflows pill at ${width}px`,
+          ).toBeLessThanOrEqual(linkBox.x + linkBox.width + 0.5)
+        }
+      }
+    }
   })
 
   test('applies light and dark color schemes', async ({ page }) => {
@@ -317,6 +563,133 @@ test.describe('Homepage', () => {
       .poll(() => photo.evaluate((img: HTMLImageElement) => img.naturalWidth))
       .toBeGreaterThan(0)
   })
+
+  test('shows shape-matched focus-visible rings on keyboard navigation', async ({
+    page,
+  }) => {
+    const readFocusRing = (locator: Locator) =>
+      locator.evaluate((element) => {
+        const style = getComputedStyle(element)
+        const canvas = document.createElement('canvas')
+        canvas.width = canvas.height = 1
+        const context = canvas.getContext('2d')
+        if (!context) {
+          throw new Error('Could not measure focus outline color')
+        }
+        context.fillStyle = style.outlineColor
+        context.fillRect(0, 0, 1, 1)
+        return {
+          display: style.display,
+          outlineStyle: style.outlineStyle,
+          outlineWidth: style.outlineWidth,
+          outlineOffset: style.outlineOffset,
+          borderRadius: parseFloat(style.borderRadius),
+          outlineColor: Array.from(context.getImageData(0, 0, 1, 1).data),
+        }
+      })
+
+    const expectedRingColor = {
+      light: [24, 24, 27, 255],
+      dark: [244, 244, 245, 255],
+    } as const
+    const tabToSkipLink = async () => {
+      await page.keyboard.press('Tab')
+      await expect(
+        page.getByRole('link', { name: 'Skip to content' }),
+      ).toBeFocused()
+    }
+
+    for (const scheme of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme: scheme })
+      await page.setViewportSize({ width: 1280, height: 800 })
+      await page.goto('/', { waitUntil: 'networkidle' })
+
+      await tabToSkipLink()
+      await page.keyboard.press('Tab')
+      const homeAvatar = page.getByRole('link', { name: 'Home', exact: true })
+      await expect(homeAvatar).toBeFocused()
+      const homeAvatarRing = await readFocusRing(homeAvatar)
+      expect(homeAvatarRing).toMatchObject({
+        display: 'block',
+        outlineStyle: 'solid',
+        outlineWidth: '2px',
+        outlineOffset: '2px',
+        outlineColor: expectedRingColor[scheme],
+      })
+      expect(homeAvatarRing.borderRadius).toBeGreaterThanOrEqual(9999)
+
+      await page.keyboard.press('Tab')
+      const githubLink = page.getByRole('link', { name: 'Follow on GitHub' })
+      await expect(githubLink).toBeFocused()
+      expect(await readFocusRing(githubLink)).toMatchObject({
+        outlineStyle: 'solid',
+        outlineWidth: '2px',
+        outlineOffset: '2px',
+        borderRadius: 6,
+        outlineColor: expectedRingColor[scheme],
+      })
+
+      for (let i = 0; i < 5; i += 1) {
+        await page.keyboard.press('Tab')
+      }
+      const testimonialLink = page.getByRole('link', { name: 'Mike Eshelman' })
+      await expect(testimonialLink).toBeFocused()
+      expect(await readFocusRing(testimonialLink)).toMatchObject({
+        outlineStyle: 'solid',
+        outlineWidth: '2px',
+        outlineOffset: '2px',
+        borderRadius: 4,
+        outlineColor: expectedRingColor[scheme],
+      })
+
+      await page.setViewportSize({ width: 390, height: 844 })
+      await page.goto('/', { waitUntil: 'networkidle' })
+      await tabToSkipLink()
+      await page.keyboard.press('Tab')
+      await page.keyboard.press('Tab')
+      const mobileGithubLink = page.getByRole('link', {
+        name: 'Follow on GitHub',
+      })
+      await expect(mobileGithubLink).toBeFocused()
+      const mobileRing = await readFocusRing(mobileGithubLink)
+      expect(mobileRing).toMatchObject({
+        outlineStyle: 'solid',
+        outlineWidth: '2px',
+        outlineOffset: '2px',
+        outlineColor: expectedRingColor[scheme],
+      })
+      expect(mobileRing.borderRadius).toBeGreaterThanOrEqual(9999)
+
+      await page.setViewportSize({ width: 1280, height: 800 })
+      await page.goto('/404', { waitUntil: 'networkidle' })
+      await tabToSkipLink()
+      await page.keyboard.press('Tab')
+      const smallAvatar = page.getByRole('link', { name: 'Home', exact: true })
+      await expect(smallAvatar).toBeFocused()
+      const smallAvatarRing = await readFocusRing(smallAvatar)
+      expect(smallAvatarRing).toMatchObject({
+        display: 'block',
+        outlineStyle: 'solid',
+        outlineWidth: '2px',
+        outlineOffset: '2px',
+        outlineColor: expectedRingColor[scheme],
+      })
+      expect(smallAvatarRing.borderRadius).toBeGreaterThanOrEqual(9999)
+
+      await page.keyboard.press('Tab')
+      const backButton = page.getByRole('link', { name: 'Go back home' })
+      await expect(backButton).toBeFocused()
+      await expect
+        .poll(() => readFocusRing(backButton))
+        .toMatchObject({
+          outlineStyle: 'solid',
+          outlineWidth: '2px',
+          outlineOffset: '2px',
+          borderRadius: 6,
+          outlineColor: expectedRingColor[scheme],
+        })
+    }
+  })
 })
 
 test.describe('Dark scheme without JavaScript', () => {
@@ -335,6 +708,16 @@ test.describe('Dark scheme without JavaScript', () => {
 })
 
 test.describe('404 page', () => {
+  test('keeps a home button border in forced colors', async ({ page }) => {
+    await page.emulateMedia({ forcedColors: 'active' })
+    const response = await page.goto('/this-page-does-not-exist')
+    expect(response?.status()).toBe(404)
+
+    const homeButton = page.getByRole('link', { name: 'Go back home' })
+    await expect(homeButton).toHaveCSS('border-top-style', 'solid')
+    await expect(homeButton).toHaveCSS('border-top-width', '1px')
+  })
+
   test('serves the exported page at its clean URL', async ({ page }) => {
     const response = await page.goto('/404')
     expect(response?.status()).toBe(200)
@@ -354,6 +737,10 @@ test.describe('404 page', () => {
     const response = await page.goto(missingPath, { waitUntil: 'networkidle' })
     expect(response?.status()).toBe(404)
 
+    const avatar = page
+      .getByRole('link', { name: 'Home', exact: true })
+      .locator('img')
+    await expect(avatar).toHaveCSS('width', '36px')
     await expect(page).toHaveTitle('Page not found - Ying Wang')
     await expect(
       page.locator('meta[name="robots"][content="noindex"]'),
@@ -372,6 +759,7 @@ test.describe('404 page', () => {
 
     await page.getByRole('link', { name: 'Go back home' }).click()
     await expect(page).toHaveURL('/')
+    await expect(avatar).toHaveCSS('width', '64px')
     await expect(
       page.getByRole('heading', { level: 1, name: 'Need software?' }),
     ).toBeVisible()
