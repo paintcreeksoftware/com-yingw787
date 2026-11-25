@@ -138,6 +138,15 @@ test.describe('Homepage', () => {
     expect(errors.failedRequests).toEqual([])
   })
 
+  test('names Mr. Cooper and its acquirer in the Eshelman caption', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await expect(
+      page.locator('figcaption').filter({ hasText: 'Mike Eshelman' }),
+    ).toContainText('fmr. CMO of Mr. Cooper (acq. Rocket Companies)')
+  })
+
   test('has no horizontal overflow on mobile and desktop viewports', async ({
     page,
   }) => {
