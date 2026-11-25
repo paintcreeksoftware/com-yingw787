@@ -27,7 +27,7 @@ export const TestimonialSection = ({
     <section className="px-6 py-6 sm:py-8 lg:px-4 dark:bg-zinc-900">
       <figure className="mx-auto max-w-2xl">
         <p className="sr-only">5 out of 5 stars</p>
-        <div className="flex gap-x-1 text-yellow-500">
+        <div className="flex gap-x-1 text-[#c38300] dark:text-yellow-500">
           <StarIcon className="h-5 w-5 flex-none" aria-hidden="true" />
           <StarIcon className="h-5 w-5 flex-none" aria-hidden="true" />
           <StarIcon className="h-5 w-5 flex-none" aria-hidden="true" />

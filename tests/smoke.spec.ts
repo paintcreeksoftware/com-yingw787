@@ -146,6 +146,35 @@ test.describe('Homepage', () => {
     await page.emulateMedia({ colorScheme: 'dark' })
     await expect(page.locator('html')).toHaveClass(/\bdark\b/)
   })
+
+  test('uses the higher-contrast testimonial gold only in light mode', async ({
+    page,
+  }) => {
+    const star = page
+      .locator('figure')
+      .filter({ hasText: '5 out of 5 stars' })
+      .locator('svg path')
+      .first()
+    const starFill = () =>
+      star.evaluate((path) => {
+        const canvas = document.createElement('canvas')
+        canvas.width = canvas.height = 1
+        const context = canvas.getContext('2d')
+        if (!context) {
+          throw new Error('Could not measure testimonial star fill')
+        }
+        context.fillStyle = getComputedStyle(path).fill
+        context.fillRect(0, 0, 1, 1)
+        return Array.from(context.getImageData(0, 0, 1, 1).data)
+      })
+
+    await page.emulateMedia({ colorScheme: 'light' })
+    await page.goto('/', { waitUntil: 'networkidle' })
+    await expect.poll(starFill).toEqual([195, 131, 0, 255])
+
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await expect.poll(starFill).toEqual([240, 177, 0, 255])
+  })
 })
 
 test.describe('404 page', () => {
