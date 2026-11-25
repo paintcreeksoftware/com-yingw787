@@ -1,0 +1,53 @@
+name: Terraform
+
+on:
+  push:
+    paths:
+      - 'infra/aws/**'
+      - '.github/workflows/terraform.yml'
+      - 'firebase.json'
+  pull_request:
+    paths:
+      - 'infra/aws/**'
+      - '.github/workflows/terraform.yml'
+      - 'firebase.json'
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        root: [bootstrap, site]
+    defaults:
+      run:
+        working-directory: infra/aws/${{ matrix.root }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.58.1
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false -lockfile=readonly
+      - run: terraform validate
+      - run: tflint
+      - run: terraform test
+
+  static-export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+      - run: node --test infra/aws/site/tests/*.test.mjs
