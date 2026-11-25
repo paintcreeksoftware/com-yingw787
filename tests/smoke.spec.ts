@@ -59,6 +59,31 @@ function trackRuntimeErrors(
 }
 
 test.describe('Homepage', () => {
+  test('hydrates /index.html with the same header avatar as /', async ({
+    page,
+  }) => {
+    const avatar = page
+      .getByRole('link', { name: 'Home', exact: true })
+      .locator('img')
+
+    await page.goto('/', { waitUntil: 'networkidle' })
+    await expect(avatar).toBeVisible()
+    const homeAvatar = await avatar.boundingBox()
+
+    const errors = trackRuntimeErrors(page)
+    const response = await page.goto('/index.html', {
+      waitUntil: 'networkidle',
+    })
+    expect(response?.status()).toBe(200)
+    await expect(page).toHaveURL('/index.html')
+    await expect(avatar).toBeVisible()
+
+    expect.soft(errors.consoleErrors).toEqual([])
+    expect.soft(errors.pageErrors).toEqual([])
+    expect.soft(errors.failedRequests).toEqual([])
+    expect.soft(await avatar.boundingBox()).toEqual(homeAvatar)
+  })
+
   test('does not prefetch its own route', async ({ page }) => {
     const prefetchRequests: string[] = []
     page.on('request', (request) => {
@@ -310,6 +335,10 @@ test.describe('404 page', () => {
     const response = await page.goto(missingPath, { waitUntil: 'networkidle' })
     expect(response?.status()).toBe(404)
 
+    const avatar = page
+      .getByRole('link', { name: 'Home', exact: true })
+      .locator('img')
+    await expect(avatar).toHaveCSS('width', '36px')
     await expect(page).toHaveTitle('Page not found - Ying Wang')
     await expect(
       page.locator('meta[name="robots"][content="noindex"]'),
@@ -328,6 +357,7 @@ test.describe('404 page', () => {
 
     await page.getByRole('link', { name: 'Go back home' }).click()
     await expect(page).toHaveURL('/')
+    await expect(avatar).toHaveCSS('width', '64px')
     await expect(
       page.getByRole('heading', { level: 1, name: 'Need software?' }),
     ).toBeVisible()
