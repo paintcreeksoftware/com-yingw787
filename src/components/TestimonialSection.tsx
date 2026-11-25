@@ -25,7 +25,7 @@ export const TestimonialSection = ({
   role,
 }: TestimonialSectionProps) => {
   return (
-    <section className="px-6 py-6 sm:py-8 lg:px-4 dark:bg-zinc-900">
+    <article className="py-6 sm:py-8 dark:bg-zinc-900">
       <figure className="mx-auto max-w-2xl">
         <p className="sr-only">5 out of 5 stars</p>
         <div className="flex gap-x-1 text-[#c38300] dark:text-yellow-500">
@@ -69,6 +69,6 @@ export const TestimonialSection = ({
           </div>
         </figcaption>
       </figure>
-    </section>
+    </article>
   )
 }
