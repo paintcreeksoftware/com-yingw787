@@ -273,7 +273,7 @@ export default function Home() {
           </div>
         </div>
       </Container>
-      <Container>
+      <Container className="max-lg:mt-12">
         <section aria-labelledby="testimonials-heading">
           <h2 id="testimonials-heading" className="sr-only">
             Testimonials
