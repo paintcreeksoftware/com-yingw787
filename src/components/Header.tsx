@@ -52,7 +52,7 @@ export function Header() {
   return (
     <header className="flex flex-none flex-col">
       {isHomePage ? (
-        <Container className="-mb-3 pt-32">
+        <Container className="-mb-3 pt-8 sm:pt-16 lg:pt-32">
           <Avatar large prefetch={false} className="block h-16 w-16" />
         </Container>
       ) : (
