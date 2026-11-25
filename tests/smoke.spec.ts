@@ -139,6 +139,22 @@ test.describe('Accessibility structure', () => {
 })
 
 test.describe('Homepage', () => {
+  test('downloads the portrait only once, as AVIF', async ({ page }) => {
+    const portraitRequests: string[] = []
+    page.on('request', (request) => {
+      const { pathname } = new URL(request.url())
+      if (/\/portrait-\d+\.[^/]+\.(avif|jpeg)$/.test(pathname)) {
+        portraitRequests.push(pathname)
+      }
+    })
+
+    await page.goto('/', { waitUntil: 'networkidle' })
+
+    expect(portraitRequests).toEqual([
+      expect.stringMatching(/\/portrait-420\.[^/]+\.avif$/),
+    ])
+  })
+
   test('hydrates /index.html with the same header avatar as /', async ({
     page,
   }) => {
