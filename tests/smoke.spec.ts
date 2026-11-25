@@ -141,10 +141,13 @@ test.describe('Homepage', () => {
   test('applies light and dark color schemes', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'light' })
     await page.goto('/', { waitUntil: 'networkidle' })
-    await expect(page.locator('html')).not.toHaveClass(/\bdark\b/)
+    await expect(page.locator('html')).toHaveCSS('color-scheme', 'light')
+    const body = page.locator('body')
+    await expect(body).not.toHaveCSS('background-color', 'rgb(0, 0, 0)')
 
     await page.emulateMedia({ colorScheme: 'dark' })
-    await expect(page.locator('html')).toHaveClass(/\bdark\b/)
+    await expect(page.locator('html')).toHaveCSS('color-scheme', 'dark')
+    await expect(body).toHaveCSS('background-color', 'rgb(0, 0, 0)')
   })
 
   test('uses the higher-contrast testimonial gold only in light mode', async ({
@@ -175,6 +178,21 @@ test.describe('Homepage', () => {
     await page.emulateMedia({ colorScheme: 'dark' })
     await expect.poll(starFill).toEqual([240, 177, 0, 255])
   })
+})
+
+test.describe('Dark scheme without JavaScript', () => {
+  test.use({ colorScheme: 'dark', javaScriptEnabled: false })
+
+  for (const path of ['/', '/this-page-does-not-exist']) {
+    test(`renders ${path} with the dark palette`, async ({ page }) => {
+      await page.goto(path)
+      await expect(page.locator('html')).toHaveCSS('color-scheme', 'dark')
+      await expect(page.locator('body')).toHaveCSS(
+        'background-color',
+        'rgb(0, 0, 0)',
+      )
+    })
+  }
 })
 
 test.describe('404 page', () => {
