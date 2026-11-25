@@ -84,8 +84,8 @@ src/
 
 ## Environment variables
 
-| Variable | Description |
-|---|---|
+| Variable               | Description                                          |
+| ---------------------- | ---------------------------------------------------- |
 | `NEXT_PUBLIC_SITE_URL` | Public URL of the site (e.g. `https://yingw787.com`) |
 
 ## License
