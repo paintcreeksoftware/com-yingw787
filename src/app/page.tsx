@@ -178,7 +178,7 @@ export default function Home() {
       <Container className="mt-8 sm:mt-16 lg:mt-32">
         <div className="grid grid-cols-1 gap-y-10 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12">
           <div className="lg:row-span-2">
-            <h1 className="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
+            <h1 className="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl lg:max-xl:text-[2.75rem]/tight dark:text-zinc-100">
               Need software?
             </h1>
             <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
@@ -221,7 +221,7 @@ export default function Home() {
             </div>
           </div>
           <div className="lg:pl-20">
-            <div className="max-w-xs px-2.5 lg:max-w-none">
+            <div className="max-w-xs px-2.5 sm:max-lg:mx-auto lg:max-w-none">
               <picture>
                 <source
                   type="image/avif"

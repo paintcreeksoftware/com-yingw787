@@ -473,6 +473,35 @@ test.describe('Homepage', () => {
     await expect(body).toHaveCSS('background-color', 'rgb(0, 0, 0)')
   })
 
+  test('centers the tablet portrait and keeps the small desktop headline on one line', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 768, height: 980 })
+    await page.goto('/')
+
+    const center = await page.evaluate(
+      () => document.documentElement.clientWidth / 2,
+    )
+    const portrait = await page.locator('main img').first().boundingBox()
+    expect(portrait).not.toBeNull()
+    if (portrait) {
+      expect.soft(portrait.x + portrait.width / 2).toBeCloseTo(center)
+    }
+
+    await page.setViewportSize({ width: 1024, height: 980 })
+    const heading = page.getByRole('heading', {
+      level: 1,
+      name: 'Need software?',
+    })
+    const lines = await heading.evaluate((element) => {
+      const range = document.createRange()
+      range.selectNodeContents(element)
+      return new Set(Array.from(range.getClientRects(), (rect) => rect.top))
+        .size
+    })
+    expect(lines).toBe(1)
+  })
+
   test('uses the higher-contrast testimonial gold only in light mode', async ({
     page,
   }) => {
