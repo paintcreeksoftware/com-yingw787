@@ -70,7 +70,13 @@ export const TestimonialSection = ({
                 </a>
               </div>
             )}
-            <div className="mt-0.5 text-zinc-800 dark:text-zinc-100">
+            <div
+              className={
+                author
+                  ? 'mt-0.5 text-zinc-600 dark:text-zinc-400'
+                  : 'mt-0.5 text-zinc-800 dark:text-zinc-100'
+              }
+            >
               {role}
             </div>
           </div>
