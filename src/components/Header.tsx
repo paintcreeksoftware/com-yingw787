@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useSelectedLayoutSegment } from 'next/navigation'
 import clsx from 'clsx'
 import { preload } from 'react-dom'
 
@@ -46,7 +46,16 @@ function Avatar({
   preload(src, { as: 'image', imageSrcSet: srcSet })
 
   return (
-    <Link href="/" aria-label="Home" className={className} {...props}>
+    <Link
+      href="/"
+      aria-label="Home"
+      className={clsx(
+        'block rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:focus-visible:outline-zinc-100',
+        large ? 'h-16 w-16' : 'h-9 w-9',
+        className,
+      )}
+      {...props}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element -- Next Image does not accept a custom srcSet with static export. */}
       <img
         src={src}
@@ -65,13 +74,13 @@ function Avatar({
 }
 
 export function Header() {
-  const isHomePage = usePathname() === '/'
+  const isHomePage = useSelectedLayoutSegment() === null
 
   return (
     <header className="flex flex-none flex-col">
       {isHomePage ? (
         <Container className="-mb-3 pt-32">
-          <Avatar large prefetch={false} className="block h-16 w-16" />
+          <Avatar large prefetch={false} aria-current="page" />
         </Container>
       ) : (
         <div className="h-16 pt-6">
