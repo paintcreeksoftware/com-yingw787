@@ -1,0 +1,49 @@
+name: Delete preview channels
+
+on:
+  pull_request:
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: List the channels that would be deleted without deleting them
+        type: boolean
+        default: false
+
+concurrency:
+  group: delete-preview-channels
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  delete-preview-channels:
+    name: Delete preview channels of closed PRs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - name: Delete channels whose PR is no longer open
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          firebase() { npx --yes firebase-tools@15.37.0 "$@" --project "$PROJECT_ID"; }
+          channels=$(firebase hosting:channel:list --json |
+            jq -r '.result.channels[].name | split("/") | last | select(test("^pr-[0-9]+$"))')
+          for channel in $channels; do
+            state=$(gh pr view "${channel#pr-}" --json state --jq .state)
+            if [ "$state" = OPEN ]; then
+              echo "Keeping $channel (PR open)"
+            elif [ "$DRY_RUN" = true ]; then
+              echo "Would delete $channel (PR $state)"
+            else
+              echo "Deleting $channel (PR $state)"
+              firebase hosting:channel:delete "$channel" --force
+            fi
+          done
