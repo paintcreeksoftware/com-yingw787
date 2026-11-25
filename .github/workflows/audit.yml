@@ -19,4 +19,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+        id: install
+      - run: npm run check-licenses
       - run: npm audit --audit-level=high
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
