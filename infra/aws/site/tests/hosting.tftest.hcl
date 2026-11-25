@@ -1,5 +1,9 @@
 mock_provider "aws" {}
 
+mock_provider "aws" {
+  alias = "virginia"
+}
+
 run "private_static_hosting" {
   command = plan
 
