@@ -18,6 +18,8 @@ Spotlight](https://tailwindcss.com/plus) template with Next.js.
 
 ## Development
 
+Use Node.js 24 to match CI.
+
 Install dependencies and create a local env file:
 
 ```bash
