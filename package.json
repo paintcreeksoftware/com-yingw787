@@ -18,6 +18,12 @@
     "test:smoke": "playwright test"
   },
   "bundlewatch": {
+    "ci": {
+      "repoBranchBase": "main",
+      "trackBranches": [
+        "main"
+      ]
+    },
     "files": [
       {
         "path": ".next/static/chunks/*.js",

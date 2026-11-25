@@ -22,6 +22,6 @@ jobs:
       - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
-      - run: npx bundlewatch
+      - run: node scripts/check-bundle-baseline.mjs
         env:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
