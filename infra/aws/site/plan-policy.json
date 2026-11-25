@@ -40,7 +40,12 @@
         "s3:GetLifecycleConfiguration",
         "s3:GetReplicationConfiguration"
       ],
-      "Resource": "arn:aws:s3:::YOUR_SITE_BUCKET"
+      "Resource": "arn:aws:s3:::*",
+      "Condition": {
+        "StringEquals": {
+          "s3:ResourceAccount": "YOUR_ACCOUNT_ID"
+        }
+      }
     },
     {
       "Effect": "Allow",
@@ -48,22 +53,22 @@
         "cloudfront:GetDistribution",
         "cloudfront:ListTagsForResource"
       ],
-      "Resource": "arn:aws:cloudfront::YOUR_ACCOUNT_ID:distribution/YOUR_DISTRIBUTION_ID"
+      "Resource": "arn:aws:cloudfront::YOUR_ACCOUNT_ID:distribution/*"
     },
     {
       "Effect": "Allow",
       "Action": "cloudfront:GetOriginAccessControl",
-      "Resource": "arn:aws:cloudfront::YOUR_ACCOUNT_ID:origin-access-control/YOUR_OAC_ID"
+      "Resource": "arn:aws:cloudfront::YOUR_ACCOUNT_ID:origin-access-control/*"
     },
     {
       "Effect": "Allow",
       "Action": "cloudfront:GetCachePolicy",
-      "Resource": "arn:aws:cloudfront::YOUR_ACCOUNT_ID:cache-policy/YOUR_CACHE_POLICY_ID"
+      "Resource": "arn:aws:cloudfront::YOUR_ACCOUNT_ID:cache-policy/*"
     },
     {
       "Effect": "Allow",
       "Action": "cloudfront:GetResponseHeadersPolicy",
-      "Resource": "arn:aws:cloudfront::YOUR_ACCOUNT_ID:response-headers-policy/YOUR_HEADERS_POLICY_ID"
+      "Resource": "arn:aws:cloudfront::YOUR_ACCOUNT_ID:response-headers-policy/*"
     },
     {
       "Effect": "Allow",
@@ -73,7 +78,7 @@
     {
       "Effect": "Allow",
       "Action": ["acm:DescribeCertificate", "acm:ListTagsForCertificate"],
-      "Resource": "arn:aws:acm:us-east-1:YOUR_ACCOUNT_ID:certificate/YOUR_CERTIFICATE_ID"
+      "Resource": "arn:aws:acm:us-east-1:YOUR_ACCOUNT_ID:certificate/*"
     },
     {
       "Effect": "Allow",

@@ -28,15 +28,21 @@ The site state key is `yingw787.com/site.tfstate` in the default Terraform
 workspace. The backend uses native S3 lockfiles. Do not commit state or plans.
 
 For a plan-only identity, attach [the site plan IAM policy](site/plan-policy.json)
-after filling in the bucket names, AWS account ID, hosted zone ID and any
-existing generated resource IDs (use the suffix of the certificate ARN for
-its ID). If a resource does not exist yet, use `*` just for its generated ID
-and narrow the ARN once it has been provisioned. The policy requires a
-dedicated state bucket: it lists that bucket, reads only the site state object,
-and can write or delete only the corresponding lockfile. It cannot apply a
-plan, modify DNS or publish the site. AWS STS `GetCallerIdentity` is called
-but requires no grant. The policy is for the site root; provisioning the
-state bucket is a separate operator step. Prefer short-lived credentials.
+after filling in only `YOUR_ACCOUNT_ID`, `YOUR_STATE_BUCKET`, and
+`YOUR_ZONE_ID`. Reads of bucket configuration are limited to buckets owned
+by that account. Reads of CloudFront and ACM resources with generated IDs
+are scoped to the account and resource type. The policy requires a dedicated
+state bucket: it lists that bucket, reads only the site state object, and
+can write or delete only the corresponding lockfile. It cannot apply a plan,
+modify DNS or publish the site.
+
+On empty site state, Terraform uses the S3 backend and calls STS
+`GetCallerIdentity` (which requires no grant). Enabling the custom domain
+also reads the existing public Route 53 zone and its tags by ID. There is no
+zone-by-name, DNS record, or GitHub OIDC provider lookup on the first plan.
+The policy also covers refresh after provisioning. It is for the site root;
+provisioning the state bucket is a separate operator step. Prefer short-lived
+credentials.
 
 ## Preview
 
