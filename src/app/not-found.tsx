@@ -18,7 +18,7 @@ export default function NotFound() {
           Page not found
         </h1>
         <p className="mt-4 text-center text-base text-zinc-600 dark:text-zinc-400">
-          Sorry, we couldn't find the page you're looking for.
+          Sorry, we couldn’t find the page you’re looking for.
         </p>
         <Button href="/" prefetch={false} variant="secondary" className="mt-4">
           Go back home

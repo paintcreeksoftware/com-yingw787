@@ -115,11 +115,11 @@ test.describe('Homepage', () => {
     }
 
     await expect(page.locator('blockquote')).toHaveCount(6)
-    await expect(
-      page
-        .locator('blockquote')
-        .filter({ hasText: "integrations I've worked on" }),
-    ).toBeVisible()
+    const acquisitionQuote = page
+      .locator('blockquote')
+      .filter({ hasText: 'integrations I’ve worked on' })
+    await expect(acquisitionQuote).toBeVisible()
+    await expect(acquisitionQuote).toContainText('they’re stuck with')
 
     const images = page.locator('img')
     const imageCount = await images.count()
@@ -323,7 +323,7 @@ test.describe('404 page', () => {
       page.getByRole('heading', { level: 1, name: 'Page not found' }),
     ).toBeVisible()
     await expect(
-      page.getByText("Sorry, we couldn't find the page you're looking for."),
+      page.getByText('Sorry, we couldn’t find the page you’re looking for.'),
     ).toBeVisible()
 
     const mobileOverflow = await page.evaluate(
