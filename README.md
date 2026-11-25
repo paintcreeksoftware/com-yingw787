@@ -61,11 +61,20 @@ npm run typecheck          # TypeScript type check
 npm run lint               # ESLint
 npm run check              # types + lint + format (all at once)
 npm run fix                # auto-fix lint and formatting issues
-npm run test:smoke         # run browser smoke tests against the static export (build first)
+npm run test:smoke         # run browser smoke tests against the static export
 npm run check-bundle-size  # verify JS/CSS bundle limits (JS: 265kB, CSS: 31kB)
 npm run check-licenses     # check production dependency licenses
 npm run check-dead-links   # verify links (HTTP 429 counts as a pass)
 npm run check-external-links  # verify external links
+```
+
+Before running `npm run test:smoke` on a fresh checkout, install Playwright's
+Chromium browser once and build the static export:
+
+```bash
+npx playwright install chromium
+npm run build
+npm run test:smoke
 ```
 
 ## Project structure
