@@ -23,6 +23,8 @@ jobs:
       - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
+      - name: Generate exact asset cache headers
+        run: node scripts/apply-asset-cache-headers.mjs
       - uses: FirebaseExtended/action-hosting-deploy@v0
         id: firebase
         with:

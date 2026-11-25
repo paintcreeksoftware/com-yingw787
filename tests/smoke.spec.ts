@@ -1,3 +1,16 @@
+import { execFileSync } from 'node:child_process'
+import {
+  existsSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+} from 'node:fs'
+import { createServer } from 'node:http'
+import type { AddressInfo } from 'node:net'
+import { tmpdir } from 'node:os'
+import nodePath from 'node:path'
 import { type Locator, type Page, expect, test } from '@playwright/test'
 
 interface RuntimeErrors {
@@ -335,5 +348,291 @@ test.describe('404 page', () => {
     expect(errors.consoleErrors).toEqual([])
     expect(errors.pageErrors).toEqual([])
     expect(errors.failedRequests).toEqual([])
+  })
+})
+
+interface FirebaseHeaderRule {
+  source?: string
+  regex?: string
+  headers: Array<{ key: string; value: string }>
+}
+
+interface FirebaseHostingConfig {
+  hosting: {
+    headers?: FirebaseHeaderRule[]
+  }
+}
+
+function resolveFirebaseHeaders(
+  config: FirebaseHostingConfig,
+  urlPath: string,
+): Record<string, string> {
+  // Firebase Hosting defaults to max-age=3600 when no rule sets Cache-Control.
+  const resolved: Record<string, string> = {
+    'Cache-Control': 'max-age=3600',
+  }
+  for (const rule of config.hosting.headers ?? []) {
+    const matched = rule.regex
+      ? new RegExp(rule.regex).test(urlPath)
+      : rule.source === '**' || rule.source === urlPath
+    if (matched) {
+      for (const { key, value } of rule.headers) {
+        resolved[key] = value
+      }
+    }
+  }
+  return resolved
+}
+
+function loadGeneratedFirebaseConfig(): FirebaseHostingConfig {
+  const tempDir = mkdtempSync(nodePath.join(tmpdir(), 'firebase-headers-'))
+  const outputPath = nodePath.join(tempDir, 'firebase.json')
+  try {
+    execFileSync(
+      'node',
+      ['scripts/apply-asset-cache-headers.mjs', '--output', outputPath],
+      { stdio: 'pipe' },
+    )
+    return JSON.parse(readFileSync(outputPath, 'utf8')) as FirebaseHostingConfig
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true })
+  }
+}
+
+function contentTypeForPath(filePath: string): string {
+  switch (nodePath.extname(filePath)) {
+    case '.html':
+      return 'text/html; charset=utf-8'
+    case '.js':
+      return 'application/javascript; charset=utf-8'
+    case '.css':
+      return 'text/css; charset=utf-8'
+    case '.webp':
+      return 'image/webp'
+    case '.jpeg':
+      return 'image/jpeg'
+    case '.ico':
+      return 'image/x-icon'
+    default:
+      return 'application/octet-stream'
+  }
+}
+
+test.describe('Firebase Hosting cache rules', () => {
+  test('only gives immutable caching to built hashed assets and never to HTML or missing paths', () => {
+    const config = loadGeneratedFirebaseConfig()
+    const outDir = nodePath.resolve('out')
+    const mediaDir = nodePath.join(outDir, '_next/static/media')
+    const chunksDir = nodePath.join(outDir, '_next/static/chunks')
+
+    const existingMedia = readdirSync(mediaDir).find((file) =>
+      file.startsWith('picture_mike_eshelman.'),
+    )
+    const existingChunk = readdirSync(chunksDir).find((file) =>
+      file.endsWith('.css'),
+    )
+    expect(existingMedia).toBeDefined()
+    expect(existingChunk).toBeDefined()
+
+    const rootHeaders = resolveFirebaseHeaders(config, '/')
+    expect(rootHeaders['Cache-Control']).toBe('no-cache')
+    expect(rootHeaders['X-Frame-Options']).toBe('DENY')
+
+    const mediaHeaders = resolveFirebaseHeaders(
+      config,
+      `/_next/static/media/${existingMedia ?? ''}`,
+    )
+    expect(mediaHeaders['Cache-Control']).toBe(
+      'public, max-age=31536000, immutable',
+    )
+    expect(mediaHeaders['X-Content-Type-Options']).toBe('nosniff')
+
+    const chunkHeaders = resolveFirebaseHeaders(
+      config,
+      `/_next/static/chunks/${existingChunk ?? ''}`,
+    )
+    expect(chunkHeaders['Cache-Control']).toBe(
+      'public, max-age=31536000, immutable',
+    )
+
+    const missingMediaHeaders = resolveFirebaseHeaders(
+      config,
+      '/_next/static/media/picture_mike_eshelman.0000000000000.webp',
+    )
+    expect(missingMediaHeaders['Cache-Control']).toBe('no-cache')
+
+    const missingChunkHeaders = resolveFirebaseHeaders(
+      config,
+      '/_next/static/chunks/0000000000000.js',
+    )
+    expect(missingChunkHeaders['Cache-Control']).toBe('no-cache')
+  })
+
+  test('does not cache missing hashed asset 404s or stale HTML across deploys', async ({
+    browser,
+  }) => {
+    const config = loadGeneratedFirebaseConfig()
+    const outDir = nodePath.resolve('out')
+    const mediaFiles = readdirSync(nodePath.join(outDir, '_next/static/media'))
+    const currentAvatarFile = mediaFiles.find((file) =>
+      file.startsWith('picture_mike_eshelman.'),
+    )
+    expect(currentAvatarFile).toBeDefined()
+
+    const currentAvatarPath = `/_next/static/media/${currentAvatarFile ?? ''}`
+    const staleAvatarPath =
+      '/_next/static/media/picture_mike_eshelman.0000000000000.webp'
+    const avatarBytes = readFileSync(
+      nodePath.join(outDir, currentAvatarPath.slice(1)),
+    )
+    const currentHtml = readFileSync(
+      nodePath.join(outDir, 'index.html'),
+      'utf8',
+    )
+    const staleHtml = currentHtml.replaceAll(currentAvatarPath, staleAvatarPath)
+    const notFoundHtml = readFileSync(nodePath.join(outDir, '404.html'), 'utf8')
+
+    let serveCurrentHtml = false
+    let staleAvatarRestored = false
+    let staleAvatarOriginHits = 0
+
+    const server = createServer((req, res) => {
+      const urlPath = new URL(req.url ?? '/', 'http://127.0.0.1').pathname
+      const headers = resolveFirebaseHeaders(config, urlPath)
+
+      if (urlPath === '/' || urlPath === '/index.html') {
+        res.writeHead(200, {
+          ...headers,
+          'Content-Type': 'text/html; charset=utf-8',
+        })
+        res.end(serveCurrentHtml ? currentHtml : staleHtml)
+        return
+      }
+
+      if (urlPath === staleAvatarPath) {
+        staleAvatarOriginHits += 1
+        if (!staleAvatarRestored) {
+          res.writeHead(404, {
+            ...headers,
+            'Content-Type': 'text/html; charset=utf-8',
+          })
+          res.end(notFoundHtml)
+          return
+        }
+        res.writeHead(200, { ...headers, 'Content-Type': 'image/webp' })
+        res.end(avatarBytes)
+        return
+      }
+
+      const filePath = nodePath.join(outDir, urlPath.slice(1))
+      if (existsSync(filePath) && statSync(filePath).isFile()) {
+        res.writeHead(200, {
+          ...headers,
+          'Content-Type': contentTypeForPath(filePath),
+        })
+        res.end(readFileSync(filePath))
+        return
+      }
+
+      res.writeHead(404, {
+        ...headers,
+        'Content-Type': 'text/html; charset=utf-8',
+      })
+      res.end(notFoundHtml)
+    })
+
+    await new Promise<void>((resolve) => {
+      server.listen(0, '127.0.0.1', () => {
+        resolve()
+      })
+    })
+    const { port } = server.address() as AddressInfo
+    const origin = `http://127.0.0.1:${String(port)}`
+
+    const context = await browser.newContext()
+    try {
+      // 1. Stale HTML requests a missing hashed avatar -> 404 with no-cache.
+      const page1 = await context.newPage()
+      let firstStatus: number | null = null
+      let firstCacheControl: string | undefined
+      page1.on('response', (response) => {
+        if (new URL(response.url()).pathname === staleAvatarPath) {
+          firstStatus = response.status()
+          firstCacheControl = response.headers()['cache-control']
+        }
+      })
+
+      await page1.goto(origin, { waitUntil: 'networkidle' })
+      const avatar1 = page1
+        .locator('figcaption')
+        .filter({ hasText: 'Mike Eshelman' })
+        .locator('img')
+      await avatar1.scrollIntoViewIfNeeded()
+      await expect.poll(() => firstStatus).toBe(404)
+      expect(firstCacheControl).toBe('no-cache')
+      expect(
+        await avatar1.evaluate((img: HTMLImageElement) => img.naturalWidth),
+      ).toBe(0)
+      expect(staleAvatarOriginHits).toBe(1)
+
+      // 2. Restore the missing asset at the origin; same browser cache must revalidate and load 200.
+      staleAvatarRestored = true
+      const page2 = await context.newPage()
+      let secondStatus: number | null = null
+      page2.on('response', (response) => {
+        if (new URL(response.url()).pathname === staleAvatarPath) {
+          secondStatus = response.status()
+        }
+      })
+
+      await page2.goto(origin, { waitUntil: 'networkidle' })
+      const avatar2 = page2
+        .locator('figcaption')
+        .filter({ hasText: 'Mike Eshelman' })
+        .locator('img')
+      await avatar2.scrollIntoViewIfNeeded()
+      await expect.poll(() => secondStatus).toBe(200)
+      await expect
+        .poll(() =>
+          avatar2.evaluate((img: HTMLImageElement) => img.naturalWidth),
+        )
+        .toBeGreaterThan(0)
+      expect(staleAvatarOriginHits).toBe(2)
+
+      // 3. New deploy swaps HTML to the new hashed avatar and removes the old one;
+      //    same browser cache must revalidate HTML and load the new avatar without hitting the old URL.
+      serveCurrentHtml = true
+      staleAvatarRestored = false
+      const hitsBeforeDeploy = staleAvatarOriginHits
+      const page3 = await context.newPage()
+      let currentAssetStatus: number | null = null
+      let currentAssetCacheControl: string | undefined
+      page3.on('response', (response) => {
+        if (new URL(response.url()).pathname === currentAvatarPath) {
+          currentAssetStatus = response.status()
+          currentAssetCacheControl = response.headers()['cache-control']
+        }
+      })
+
+      await page3.goto(origin, { waitUntil: 'networkidle' })
+      const avatar3 = page3
+        .locator('figcaption')
+        .filter({ hasText: 'Mike Eshelman' })
+        .locator('img')
+      await avatar3.scrollIntoViewIfNeeded()
+      await expect.poll(() => currentAssetStatus).toBe(200)
+      expect(currentAssetCacheControl).toBe(
+        'public, max-age=31536000, immutable',
+      )
+      await expect
+        .poll(() =>
+          avatar3.evaluate((img: HTMLImageElement) => img.naturalWidth),
+        )
+        .toBeGreaterThan(0)
+      expect(staleAvatarOriginHits).toBe(hitsBeforeDeploy)
+    } finally {
+      await context.close()
+      server.close()
+    }
   })
 })
