@@ -28,6 +28,7 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          firebaseToolsVersion: 15.37.0
           projectId: ${{ vars.FIREBASE_PROJECT_ID }}
           channelId: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'live' }}
       - name: Lighthouse CI
