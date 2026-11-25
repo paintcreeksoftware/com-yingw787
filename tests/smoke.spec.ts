@@ -1,4 +1,4 @@
-import { type Page, expect, test } from '@playwright/test'
+import { type Locator, type Page, expect, test } from '@playwright/test'
 
 interface RuntimeErrors {
   consoleErrors: string[]
@@ -118,7 +118,7 @@ test.describe('Homepage', () => {
 
     const images = page.locator('img')
     const imageCount = await images.count()
-    expect(imageCount).toBe(8)
+    expect(imageCount).toBe(5)
 
     for (let i = 0; i < imageCount; i += 1) {
       const img = images.nth(i)
@@ -197,6 +197,81 @@ test.describe('Homepage', () => {
 
     await page.emulateMedia({ colorScheme: 'dark' })
     await expect.poll(starFill).toEqual([240, 177, 0, 255])
+  })
+
+  test('themes fallback avatars and unloaded testimonial photos', async ({
+    page,
+  }) => {
+    const photoPath = /\/picture_mike_eshelman\.[^/]+\.webp$/
+    const photoReady = Promise.withResolvers<undefined>()
+    await page.route(photoPath, async (route) => {
+      await photoReady.promise
+      await route.continue()
+    })
+
+    await page.emulateMedia({ colorScheme: 'light' })
+    const photoRequest = page.waitForRequest(photoPath)
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
+
+    const captions = page.locator('figcaption')
+    const photoAvatar = captions
+      .filter({ hasText: 'Mike Eshelman' })
+      .locator(':scope > span[aria-hidden="true"]')
+    const photo = photoAvatar.locator('img')
+    const placeholderAvatars = [
+      'VP of Acquisition Marketing',
+      'Lihan Zhang',
+      'Addison Jones',
+    ].map((name) =>
+      captions
+        .filter({ hasText: name })
+        .locator(':scope > span[aria-hidden="true"]'),
+    )
+    const readColor = (
+      locator: Locator,
+      cssProperty: 'background-color' | 'color',
+    ) =>
+      locator.evaluate((element, property) => {
+        const canvas = document.createElement('canvas')
+        canvas.width = canvas.height = 1
+        const context = canvas.getContext('2d')
+        if (!context) {
+          throw new Error('Could not measure testimonial avatar color')
+        }
+        context.fillStyle = getComputedStyle(element).getPropertyValue(property)
+        context.fillRect(0, 0, 1, 1)
+        return Array.from(context.getImageData(0, 0, 1, 1).data)
+      }, cssProperty)
+
+    try {
+      await photoAvatar.scrollIntoViewIfNeeded()
+      await photoRequest
+      await expect(photo).toHaveJSProperty('complete', false)
+      for (const [scheme, background, glyphColor] of [
+        ['light', [244, 244, 245, 255], [113, 113, 123, 255]],
+        ['dark', [39, 39, 42, 255], [159, 159, 169, 255]],
+      ] as const) {
+        await page.emulateMedia({ colorScheme: scheme })
+        await expect
+          .poll(() => readColor(photoAvatar, 'background-color'))
+          .toEqual(background)
+        for (const avatar of placeholderAvatars) {
+          await expect
+            .poll(() => readColor(avatar, 'background-color'))
+            .toEqual(background)
+          await expect(avatar.locator('img')).toHaveCount(0)
+          await expect
+            .poll(() => readColor(avatar.locator('svg'), 'color'))
+            .toEqual(glyphColor)
+        }
+      }
+      await expect(photo).toHaveJSProperty('complete', false)
+    } finally {
+      photoReady.resolve(undefined)
+    }
+    await expect
+      .poll(() => photo.evaluate((img: HTMLImageElement) => img.naturalWidth))
+      .toBeGreaterThan(0)
   })
 })
 

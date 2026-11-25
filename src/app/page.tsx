@@ -19,7 +19,6 @@ import portrait1260Jpeg from '@/images/portrait/portrait-1260.jpeg'
 import MikeEshelman from '@/images/picture_mike_eshelman.webp'
 import AlanMcKellar from '@/images/picture_alan_mckellar.webp'
 import MikeSpainhower from '@/images/picture_mike_spainhower.webp'
-import DefaultAvatar from '@/images/picture_default_avatar.webp'
 
 const portraitSizes =
   '(min-width: 78rem) 25.75rem, (min-width: 64rem) calc(50vw - 13.25rem), (min-width: 22rem) 18.75rem, calc(100vw - 3.25rem)'
@@ -37,7 +36,7 @@ const portraitSrcSet = [
 interface TestimonialQuote {
   id: string
   quote: React.ReactNode
-  avatarImage: StaticImageData
+  avatarImage?: StaticImageData
   name?: React.ReactNode
   role?: React.ReactNode
 }
@@ -128,7 +127,6 @@ const testimonials: TestimonialQuote[] = [
         they&apos;re stuck with [legacy solutions].
       </>
     ),
-    avatarImage: DefaultAvatar,
     role: <>VP of Acquisition Marketing, Series F security startup</>,
   },
   {
@@ -144,7 +142,6 @@ const testimonials: TestimonialQuote[] = [
         not be the engineer I am today without his guidance.
       </>
     ),
-    avatarImage: DefaultAvatar,
     name: (
       <a
         href="https://www.linkedin.com/in/lihan-zhang-3b24a594"
@@ -169,7 +166,6 @@ const testimonials: TestimonialQuote[] = [
         recommendation for Ying as both an engineer, leader, and friend.
       </>
     ),
-    avatarImage: DefaultAvatar,
     name: (
       <a
         href="https://www.linkedin.com/in/addisonjones3"
