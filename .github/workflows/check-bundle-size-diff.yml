@@ -12,14 +12,17 @@ jobs:
     name: Check bundle size diff
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
       - uses: preactjs/compressed-size-action@v2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+          # The action installs before each build; reuse the PR's install for
+          # the base build when the lockfile is unchanged.
+          install-script: >-
+            bash -c "test -d node_modules && git diff --quiet ${{ github.sha }} -- package-lock.json || npm ci"
           build-script: build
           pattern: '.next/static/**/*.{js,css}'
