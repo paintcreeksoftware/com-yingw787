@@ -11,8 +11,7 @@ Spotlight](https://tailwindcss.com/plus) template with Next.js.
 - **[Next.js](https://nextjs.org)** (App Router, static export)
 - **[Tailwind CSS](https://tailwindcss.com)** v4
 - **[TypeScript](https://www.typescriptlang.org)**
-- **[Headless UI](https://headlessui.dev)** +
-  **[Heroicons](https://heroicons.com)**
+- **[Heroicons](https://heroicons.com)**
 - **[Firebase Hosting](https://firebase.google.com/docs/hosting)** (deployed
   from `out/`)
 
