@@ -161,7 +161,7 @@ test.describe('Accessibility structure', () => {
       .soft(page.getByRole('link', { name: 'Home', exact: true }))
       .toHaveAttribute('aria-current', 'page')
     await expect
-      .soft(page.getByRole('paragraph').filter({ hasText: "I'm Ying" }))
+      .soft(page.getByRole('paragraph').filter({ hasText: 'I’m Ying' }))
       .toHaveCount(1)
 
     const testimonials = page.getByRole('region', { name: 'Testimonials' })
@@ -293,6 +293,11 @@ test.describe('Homepage', () => {
     }
 
     await expect(page.locator('blockquote')).toHaveCount(6)
+    const acquisitionQuote = page
+      .locator('blockquote')
+      .filter({ hasText: 'integrations I’ve worked on' })
+    await expect(acquisitionQuote).toBeVisible()
+    await expect(acquisitionQuote).toContainText('they’re stuck with')
 
     const images = page.locator('img')
     const imageCount = await images.count()
@@ -536,7 +541,7 @@ test.describe('Homepage', () => {
   }) => {
     await page.goto('/')
 
-    const intro = page.getByText(/^I'm Ying, a software engineer and founder/)
+    const intro = page.getByText(/^I’m Ying, a software engineer and founder/)
     const namedRole = page.getByText(
       'fmr. CMO of Mr. Cooper (acq. Rocket Companies)',
       {
@@ -865,7 +870,7 @@ test.describe('404 page', () => {
       page.getByRole('heading', { level: 1, name: 'Page not found' }),
     ).toBeVisible()
     await expect(
-      page.getByText("Sorry, we couldn't find the page you're looking for."),
+      page.getByText('Sorry, we couldn’t find the page you’re looking for.'),
     ).toBeVisible()
 
     const mobileOverflow = await page.evaluate(

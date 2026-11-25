@@ -72,11 +72,11 @@ const testimonials: Testimonial[] = [
     quote: (
       <>
         You want the data engineering job done right? You want Ying. He is the
-        consummate professional who seeks to understand his customer&apos;s
-        needs and then implement innovative solutions. What I really enjoyed
-        about working with Ying is that I knew I could provide some high-level
-        requirements and step away to focus on other items. He always delivered
-        for me and my teams.
+        consummate professional who seeks to understand his customer’s needs and
+        then implement innovative solutions. What I really enjoyed about working
+        with Ying is that I knew I could provide some high-level requirements
+        and step away to focus on other items. He always delivered for me and my
+        teams.
       </>
     ),
     avatarImage: AlanMcKellar,
@@ -98,7 +98,7 @@ const testimonials: Testimonial[] = [
         depend on accurate and timely acquisition channel data. I was
         particularly impressed by the level of engagement that Ying brought to
         the project, collaborating with stakeholders to ensure that their needs
-        were met. Ying&apos;s ability to work seamlessly across functions and
+        were met. Ying’s ability to work seamlessly across functions and
         effectively apply technology to solve complex business issues is a
         testament to his exceptional engineering skills.
       </>
@@ -118,7 +118,7 @@ const testimonials: Testimonial[] = [
         worked on is because of good attitudes from you and others and the
         willingness to come back to the table over and over again and clarify
         things through dialogue. A lot of companies never make it this far,
-        they&apos;re stuck with [legacy solutions].
+        they’re stuck with [legacy solutions].
       </>
     ),
     role: 'VP of Acquisition Marketing, Series F security startup',
@@ -182,10 +182,10 @@ export default function Home() {
               Need software?
             </h1>
             <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
-              I&apos;m Ying, a software engineer and founder based near
-              Washington, D.C. I like creating quality software products that
-              people are happy to use, and that coincidentally make companies
-              lots of money.
+              I’m Ying, a software engineer and founder based near Washington,
+              D.C. I like creating quality software products that people are
+              happy to use, and that coincidentally make companies lots of
+              money.
             </p>
             <div className="mt-6 flex flex-wrap gap-2 lg:flex-nowrap lg:gap-6">
               <SocialLink
