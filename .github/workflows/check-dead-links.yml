@@ -2,6 +2,7 @@ name: Check dead links
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 concurrency:
