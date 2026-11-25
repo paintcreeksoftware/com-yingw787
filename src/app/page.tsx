@@ -63,7 +63,7 @@ const testimonials: TestimonialQuote[] = [
         Mike Eshelman
       </a>
     ),
-    role: <>fmr. CMO of Mr.Cooper (acq. Rocket Mortgage)</>,
+    role: <>fmr. CMO of Mr. Cooper (acq. Rocket Companies)</>,
   },
   {
     id: 'alan-mckellar',

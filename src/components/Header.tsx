@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useSelectedLayoutSegment } from 'next/navigation'
 import clsx from 'clsx'
 
 import { Container } from '@/components/Container'
@@ -47,7 +47,7 @@ function Avatar({
 }
 
 export function Header() {
-  const isHomePage = usePathname() === '/'
+  const isHomePage = useSelectedLayoutSegment() === null
 
   return (
     <header className="flex flex-none flex-col">

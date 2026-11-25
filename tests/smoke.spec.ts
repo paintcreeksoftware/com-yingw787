@@ -139,6 +139,31 @@ test.describe('Accessibility structure', () => {
 })
 
 test.describe('Homepage', () => {
+  test('hydrates /index.html with the same header avatar as /', async ({
+    page,
+  }) => {
+    const avatar = page
+      .getByRole('link', { name: 'Home', exact: true })
+      .locator('img')
+
+    await page.goto('/', { waitUntil: 'networkidle' })
+    await expect(avatar).toBeVisible()
+    const homeAvatar = await avatar.boundingBox()
+
+    const errors = trackRuntimeErrors(page)
+    const response = await page.goto('/index.html', {
+      waitUntil: 'networkidle',
+    })
+    expect(response?.status()).toBe(200)
+    await expect(page).toHaveURL('/index.html')
+    await expect(avatar).toBeVisible()
+
+    expect.soft(errors.consoleErrors).toEqual([])
+    expect.soft(errors.pageErrors).toEqual([])
+    expect.soft(errors.failedRequests).toEqual([])
+    expect.soft(await avatar.boundingBox()).toEqual(homeAvatar)
+  })
+
   test('does not prefetch its own route', async ({ page }) => {
     const prefetchRequests: string[] = []
     page.on('request', (request) => {
@@ -218,6 +243,15 @@ test.describe('Homepage', () => {
     expect(errors.failedRequests).toEqual([])
   })
 
+  test('names Mr. Cooper and its acquirer in the Eshelman caption', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await expect(
+      page.locator('figcaption').filter({ hasText: 'Mike Eshelman' }),
+    ).toContainText('fmr. CMO of Mr. Cooper (acq. Rocket Companies)')
+  })
+
   test('has no horizontal overflow on mobile and desktop viewports', async ({
     page,
   }) => {
@@ -236,6 +270,56 @@ test.describe('Homepage', () => {
     )
     expect(desktopOverflow).toBe(false)
     await expect(page.getByText('GitHub', { exact: true })).toBeHidden()
+  })
+
+  test('reflows social link pills within their container at 200% text zoom on narrow viewports', async ({
+    page,
+  }) => {
+    const socialLinkNames = [
+      'Follow on GitHub',
+      'Follow on LinkedIn',
+      'Personal Blog',
+      'Professional Blog',
+      'Email',
+    ]
+
+    for (const width of [320, 375]) {
+      await page.setViewportSize({ width, height: 800 })
+      await page.goto('/', { waitUntil: 'networkidle' })
+      await page.addStyleTag({
+        content: 'html { font-size: 200% !important; }',
+      })
+
+      const containerBox = await page
+        .getByRole('link', { name: 'Follow on GitHub' })
+        .locator('..')
+        .boundingBox()
+      expect(containerBox).not.toBeNull()
+
+      for (const name of socialLinkNames) {
+        const link = page.getByRole('link', { name })
+        const linkBox = await link.boundingBox()
+        const labelBox = await link.locator('span').boundingBox()
+
+        expect(linkBox).not.toBeNull()
+        expect(labelBox).not.toBeNull()
+
+        if (containerBox && linkBox && labelBox) {
+          expect(
+            linkBox.x + linkBox.width,
+            `${name} pill overflows container at ${width}px`,
+          ).toBeLessThanOrEqual(containerBox.x + containerBox.width + 0.5)
+          expect(
+            linkBox.x + linkBox.width,
+            `${name} pill overflows viewport at ${width}px`,
+          ).toBeLessThanOrEqual(width + 0.5)
+          expect(
+            labelBox.x + labelBox.width,
+            `${name} label overflows pill at ${width}px`,
+          ).toBeLessThanOrEqual(linkBox.x + linkBox.width + 0.5)
+        }
+      }
+    }
   })
 
   test('applies light and dark color schemes', async ({ page }) => {
@@ -390,6 +474,10 @@ test.describe('404 page', () => {
     const response = await page.goto(missingPath, { waitUntil: 'networkidle' })
     expect(response?.status()).toBe(404)
 
+    const avatar = page
+      .getByRole('link', { name: 'Home', exact: true })
+      .locator('img')
+    await expect(avatar).toHaveCSS('width', '36px')
     await expect(page).toHaveTitle('Page not found - Ying Wang')
     await expect(
       page.locator('meta[name="robots"][content="noindex"]'),
@@ -408,6 +496,7 @@ test.describe('404 page', () => {
 
     await page.getByRole('link', { name: 'Go back home' }).click()
     await expect(page).toHaveURL('/')
+    await expect(avatar).toHaveCSS('width', '64px')
     await expect(
       page.getByRole('heading', { level: 1, name: 'Need software?' }),
     ).toBeVisible()
