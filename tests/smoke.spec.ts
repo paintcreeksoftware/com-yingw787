@@ -199,6 +199,39 @@ test.describe('Homepage', () => {
     await expect.poll(starFill).toEqual([240, 177, 0, 255])
   })
 
+  test('uses secondary text for testimonial roles only when a name is present', async ({
+    page,
+  }) => {
+    await page.goto('/')
+
+    const intro = page.getByText(/^I'm Ying, a software engineer and founder/)
+    const namedRole = page.getByText(
+      'fmr. CMO of Mr.Cooper (acq. Rocket Mortgage)',
+      {
+        exact: true,
+      },
+    )
+    const unnamedRole = page.getByText(
+      'VP of Acquisition Marketing, Series F security startup',
+      { exact: true },
+    )
+    const unnamedQuote = page
+      .locator('figure')
+      .filter({ has: unnamedRole })
+      .locator('blockquote p')
+    const textColor = (locator: Locator) =>
+      locator.evaluate((element) => getComputedStyle(element).color)
+
+    for (const colorScheme of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme })
+      await expect(namedRole).toHaveCSS('color', await textColor(intro))
+      await expect(unnamedRole).toHaveCSS(
+        'color',
+        await textColor(unnamedQuote),
+      )
+    }
+  })
+
   test('themes fallback avatars and unloaded testimonial photos', async ({
     page,
   }) => {
