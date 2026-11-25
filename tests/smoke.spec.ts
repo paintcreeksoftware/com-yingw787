@@ -59,6 +59,26 @@ function trackRuntimeErrors(
 }
 
 test.describe('Homepage', () => {
+  test('does not prefetch its own route', async ({ page }) => {
+    const prefetchRequests: string[] = []
+    page.on('request', (request) => {
+      const { pathname } = new URL(request.url())
+      const method = request.method()
+
+      if (
+        (method === 'HEAD' && pathname === '/') ||
+        pathname === '/__next._tree.txt' ||
+        pathname === '/__next.__PAGE__.txt'
+      ) {
+        prefetchRequests.push(`${method} ${pathname}`)
+      }
+    })
+
+    const response = await page.goto('/', { waitUntil: 'networkidle' })
+    expect(response?.status()).toBe(200)
+    expect(prefetchRequests).toEqual([])
+  })
+
   test('renders key content, images, and links with no runtime errors', async ({
     page,
   }) => {
