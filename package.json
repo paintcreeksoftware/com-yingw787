@@ -12,6 +12,7 @@
     "check": "tsc --noEmit && eslint . && prettier . --check && markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
     "fix": "eslint . --fix && prettier . --write",
     "check-bundle-size": "bundlewatch",
+    "check-licenses": "licensee --production --errors-only",
     "check-dead-links": "linkinator ./out --recurse --check-css --check-fragments --status-code 429:warn --verbosity error",
     "check-external-links": "linkinator ./out --recurse --check-css --check-fragments --retry --retry-errors --status-code 429:warn --verbosity error"
   },
@@ -52,6 +53,7 @@
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
+    "licensee": "12.0.2",
     "linkinator": "^7.6.1",
     "markdownlint-cli2": "^0.24.2",
     "prettier": "^3.6.2",

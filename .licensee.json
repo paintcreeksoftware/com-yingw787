@@ -1,0 +1,33 @@
+{
+  "licenses": {
+    "spdx": ["0BSD", "Apache-2.0", "BSD-3-Clause", "CC-BY-4.0", "ISC", "MIT"]
+  },
+  "packages": {
+    "@img/sharp-libvips-darwin-arm64": "1.3.4",
+    "@img/sharp-libvips-darwin-x64": "1.3.4",
+    "@img/sharp-libvips-linux-arm": "1.3.4",
+    "@img/sharp-libvips-linux-arm64": "1.3.4",
+    "@img/sharp-libvips-linux-ppc64": "1.3.4",
+    "@img/sharp-libvips-linux-riscv64": "1.3.4",
+    "@img/sharp-libvips-linux-s390x": "1.3.4",
+    "@img/sharp-libvips-linux-x64": "1.3.4",
+    "@img/sharp-libvips-linuxmusl-arm64": "1.3.4",
+    "@img/sharp-libvips-linuxmusl-x64": "1.3.4",
+    "@img/sharp-wasm32": "0.35.5",
+    "@img/sharp-win32-arm64": "0.35.5",
+    "@img/sharp-win32-ia32": "0.35.5",
+    "@img/sharp-win32-x64": "0.35.5",
+    "lightningcss": "1.31.1",
+    "lightningcss-android-arm64": "1.31.1",
+    "lightningcss-darwin-arm64": "1.31.1",
+    "lightningcss-darwin-x64": "1.31.1",
+    "lightningcss-freebsd-x64": "1.31.1",
+    "lightningcss-linux-arm-gnueabihf": "1.31.1",
+    "lightningcss-linux-arm64-gnu": "1.31.1",
+    "lightningcss-linux-arm64-musl": "1.31.1",
+    "lightningcss-linux-x64-gnu": "1.31.1",
+    "lightningcss-linux-x64-musl": "1.31.1",
+    "lightningcss-win32-arm64-msvc": "1.31.1",
+    "lightningcss-win32-x64-msvc": "1.31.1"
+  }
+}
